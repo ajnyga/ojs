@@ -71,7 +71,7 @@ class Dc11SchemaArticleAdapter extends MetadataDataObjectAdapter {
 		// contains cached entities and avoids extra database access if this
 		// adapter is called from an OAI context.
 		$oaiDao = DAORegistry::getDAO('OAIDAO'); /* @var $oaiDao OAIDAO */
-		$journal = $oaiDao->getJournal($article->getJournalId());
+		$journal = $oaiDao->getJournal($article->getData('contextId'));
 		$section = $oaiDao->getSection($article->getSectionId());
 		if (is_a($article, 'PublishedSubmission')) { /* @var $article PublishedSubmission */
 			$issue = $oaiDao->getIssue($article->getIssueId());
@@ -140,7 +140,7 @@ class Dc11SchemaArticleAdapter extends MetadataDataObjectAdapter {
 		// Format
 		if (is_a($article, 'PublishedSubmission')) {
 			$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
-			$galleys = $articleGalleyDao->getBySubmissionId($article->getId());
+			$galleys = $articleGalleyDao->getByPublicationId($article->getCurrentPublication()->getId());
 			$formats = array();
 			while ($galley = $galleys->next()) {
 				$dc11Description->addStatement('dc:format', $galley->getFileType());
@@ -178,7 +178,7 @@ class Dc11SchemaArticleAdapter extends MetadataDataObjectAdapter {
 		$galleys = array();
 		if (is_a($article, 'PublishedSubmission')) {
 			$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
-			$galleys = $articleGalleyDao->getBySubmissionId($article->getId())->toArray();
+			$galleys = $articleGalleyDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
 		}
 
 		// Language

@@ -167,7 +167,7 @@ abstract class DOIPubIdExportPlugin extends PubObjectsExportPlugin {
 	}
 
 	/**
-	 * Retrieve all unregistered articles.
+	 * Retrieve all unregistered galleys.
 	 * @param $context Context
 	 * @return array
 	 */
@@ -222,14 +222,13 @@ abstract class DOIPubIdExportPlugin extends PubObjectsExportPlugin {
 	/**
 	 * Get article galleys with a DOI assigned from gallley IDs.
 	 * @param $galleyIds array
-	 * @param $context Context
 	 * @return array
 	 */
-	function getArticleGalleys($galleyIds, $context) {
+	function getArticleGalleys($galleyIds) {
 		$galleys = array();
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
 		foreach ($galleyIds as $galleyId) {
-			$articleGalley = $articleGalleyDao->getById($galleyId, null, $context->getId());
+			$articleGalley = $articleGalleyDao->getById($galleyId);
 			if ($articleGalley && $articleGalley->getStoredPubId('doi')) $galleys[] = $articleGalley;
 		}
 		return $galleys;

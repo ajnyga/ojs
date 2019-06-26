@@ -110,7 +110,7 @@ class IssueService implements EntityPropertyInterface, EntityReadInterface {
 			->filterByNumbers($args['numbers'])
 			->filterByYears($args['years']);
 
-		\HookRegistry::call('Issue::getMany::queryBuilder', array($issueListQB, $contextId, $args));
+		\HookRegistry::call('Issue::getMany::queryBuilder', array($issueListQB, $args));
 
 		return $issueListQB;
 	}

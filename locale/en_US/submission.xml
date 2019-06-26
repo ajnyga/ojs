@@ -23,6 +23,7 @@
 	<message key="submission.submit.newSubmissionSingle">New Submission</message>
 	<message key="grid.action.workflow">Submission Workflow</message>
 	<message key="submission.abstract.wordCount.description">The abstract must be {$wordCount} words or less.</message>
+	<message key="submission.submit.noContext">This submission's journal could not be found.</message>
 
 	<message key="submission.issueEntry">Metadata</message>
 	<message key="submission.submit.whatNext.description">The journal has been notified of your submission, and you've been emailed a confirmation for your records.  Once the editor has reviewed the submission, they will contact you.</message>
@@ -83,4 +84,11 @@
 	<!-- categories -->
 	<message key="catalog.browseTitles">{$numTitles} Items</message>
 	<message key="catalog.category.heading">All Items</message>
+
+	<!-- Publication -->
+	<message key="galley.editPublishedDisabled">The galleys of this publication can not be edited because it has already been published.</message>
+	<message key="galley.publicationNotFound">The publication for this galley could not be found.</message>
+	<message key="publication.invalidSection">The section for this publication could not be found.</message>
+	<message key="publication.invalidIssue">The issue for this publication could not be found.</message>
+	<message key="publication.issueEntry.success">The issue entry details have been updated.</message>
 </locale>

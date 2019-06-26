@@ -138,7 +138,7 @@ abstract class PubIdPlugin extends PKPPubIdPlugin {
 			$submission = $submissionDao->getById($pubObject->getSubmissionId(), null, true);
 			if (!$submission) return null;
 			// Now we can identify the context.
-			$contextId = $submission->getJournalId();
+			$contextId = $submission->getData('contextId');
 		}
 		// Check the context
 		$context = $this->getContext($contextId);

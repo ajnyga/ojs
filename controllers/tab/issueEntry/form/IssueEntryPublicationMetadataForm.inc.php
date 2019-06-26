@@ -77,14 +77,6 @@ class IssueEntryPublicationMetadataForm extends Form {
 		$submission = $this->getSubmission();
 		$publishedSubmission = $this->getPublishedSubmission();
 		if ($publishedSubmission) {
-			if ($submission->getCurrentSubmissionVersion() != $submission->getSubmissionVersion()) {
-				if (!isset($this->_formParams)) {
-					$this->_formParams = array();
-				}
-
-				$this->_formParams["readOnly"] = true;
-				$this->_formParams["hideSubmit"] = true;
-			}
 
 			$templateMgr->assign('publishedSubmission', $publishedSubmission);
 			$issueDao = DAORegistry::getDAO('IssueDAO');
@@ -110,7 +102,6 @@ class IssueEntryPublicationMetadataForm extends Form {
 		$templateMgr->assign(array(
 			'submissionId' => $this->getSubmission()->getId(),
 			'stageId' => $this->getStageId(),
-			'submissionVersion' => $this->getSubmission()->getSubmissionVersion(),
 			'formParams' => $this->getFormParams(),
 			'context' => $context,
 		));
@@ -285,7 +276,7 @@ class IssueEntryPublicationMetadataForm extends Form {
 				}
 			}
 
-			$articleSearchIndex = Application::getSubmissionSearchIndex();
+			$submissionSearchIndex = Application::getSubmissionSearchIndex();
 			$submissionFilesChanged = false;
 			$submissionMetadataChanged = false;
 
@@ -316,15 +307,6 @@ class IssueEntryPublicationMetadataForm extends Form {
 					$publishedSubmission->setDatePublished(Core::getCurrentDate());
 					$publishedSubmission->setSequence(REALLY_BIG_NUMBER);
 					$publishedSubmission->setAccessStatus($accessStatus);
-					$publishedSubmission->setSubmissionVersion($submission->getSubmissionVersion());
-					$publishedSubmission->setIsCurrentSubmissionVersion(true);
-
-					$prevPublishedSubmission = $publishedSubmissionDao->getBySubmissionId($submission->getId(), null, false, $submission->getSubmissionVersion() - 1);
-					if ($prevPublishedSubmission) {
-						$prevPublishedSubmission->setIsCurrentSubmissionVersion(false);
-
-						$publishedSubmissionDao->updatePublishedSubmission($prevPublishedSubmission);
-					}
 
 					$publishedSubmissionDao->insertObject($publishedSubmission);
 
@@ -351,7 +333,7 @@ class IssueEntryPublicationMetadataForm extends Form {
 					$publishedSubmissionDao->deletePublishedSubmissionBySubmissionId($submission->getId());
 
 					// Delete the article from the search index.
-					$articleSearchIndex->submissionFileDeleted($submission->getId());
+					$submissionSearchIndex->submissionFileDeleted($submission->getId());
 				}
 			}
 
@@ -384,15 +366,15 @@ class IssueEntryPublicationMetadataForm extends Form {
 			//after the submission is updated, update the search index
 			if ($publishedSubmission) {
 				if ($submissionFilesChanged) {
-					$articleSearchIndex->submissionFilesChanged($publishedSubmission);
+					$submissionSearchIndex->submissionFilesChanged($publishedSubmission);
 				}
 
 				if ($submissionMetadataChanged) {
-					$articleSearchIndex->submissionMetadataChanged($publishedSubmission);
+					$submissionSearchIndex->submissionMetadataChanged($publishedSubmission);
 				}
 			}
 
-			$articleSearchIndex->submissionChangesFinished();
+			$submissionSearchIndex->submissionChangesFinished();
 		}
 	}
 }

@@ -45,7 +45,7 @@ class SitemapHandler extends PKPSitemapHandler {
 					// Abstract
 					$root->appendChild($this->_createUrlTree($doc, $request->url($journal->getPath(), 'article', 'view', array($article->getBestArticleId()))));
 					// Galley files
-					$galleys = $galleyDao->getBySubmissionId($article->getId());
+					$galleys = $galleyDao->getByPublicationId($article->getCurrentPublication()->getId());
 					while ($galley = $galleys->next()) {
 						$root->appendChild($this->_createUrlTree($doc, $request->url($journal->getPath(), 'article', 'view', array($article->getBestArticleId(), $galley->getBestGalleyId()))));
 					}

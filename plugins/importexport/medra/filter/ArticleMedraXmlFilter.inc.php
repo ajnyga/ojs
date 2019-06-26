@@ -272,7 +272,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		$relatedIssueNode = $this->createRelatedNode($doc, $issueWorkOrProduct, O4DOI_RELATION_IS_PART_OF, $relatedIssueIds);
 		// Galleys
 		$galleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $galleyDao ArticleGalleyDAO */
-		$galleysByArticle = $galleyDao->getBySubmissionId($article->getId())->toArray();
+		$galleysByArticle = $galleyDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
 		if (!$galley) { // if exporting object is an article
 			$contentItemNode->appendChild($relatedIssueNode);
 			// related products:

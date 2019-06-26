@@ -74,20 +74,19 @@ class ArticleSearch extends SubmissionSearch {
 			// Exclude unwanted IDs.
 			if (in_array($submissionId, $exclude)) continue;
 
+
 			switch ($orderBy) {
 				case 'authors':
-					$authors = $authorDao->getBySubmissionId($submissionId);
-					$authorNames = array();
-					foreach ($authors as $author) { /* @var $author Author */
-						$authorNames[] = $author->getFullName(false, true);
-					}
-					$orderKey = implode('; ', $authorNames);
-					unset($authors, $authorNames);
+					$submission = $submissionDao->getById($submissionId);
+					$orderKey = $submission->getAuthorString();
 					break;
 
 				case 'title':
 					$submission = $submissionDao->getById($submissionId);
-					$orderKey = $submission->getLocalizedTitle(null, false);
+					$orderKey = '';
+					if (!empty($submission->getCurrentPublication())) {
+						$orderKey = $submission->getCurrentPublication()->getLocalizedData('title');
+					}
 					break;
 
 				case 'journalTitle':
@@ -262,7 +261,7 @@ class ArticleSearch extends SubmissionSearch {
 				}
 
 				// Get the context, storing in cache if necessary.
-				$contextId = $article->getJournalId();
+				$contextId = $article->getData('contextId');
 				if (!isset($contextCache[$contextId])) {
 					$contextCache[$contextId] = $contextDao->getById($contextId);
 				}

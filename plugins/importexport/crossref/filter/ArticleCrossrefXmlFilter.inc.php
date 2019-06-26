@@ -177,7 +177,7 @@ class ArticleCrossrefXmlFilter extends IssueCrossrefXmlFilter {
 		$doiDataNode = $this->createDOIDataNode($doc, $submission->getStoredPubId('doi'), $request->url($context->getPath(), 'article', 'view', $submission->getBestArticleId(), null, null, true));
 		// append galleys files and collection nodes to the DOI data node
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
-		$galleys = $articleGalleyDao->getBySubmissionId($submission->getId());
+		$galleys = $articleGalleyDao->getByPublicationId($submission->getCurrentPublication()->getId());
 		// All full-texts, PDF full-texts and remote galleys for text-mining and as-crawled URL
 		$submissionGalleys = $pdfGalleys = $remoteGalleys = array();
 		// preferred PDF full-text for the as-crawled URL

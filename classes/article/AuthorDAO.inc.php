@@ -91,7 +91,8 @@ class AuthorDAO extends PKPAuthorDAO {
 			'SELECT DISTINCT
 				a.submission_id
 			FROM	authors a
-				LEFT JOIN submissions s ON (s.submission_id = a.submission_id)
+				LEFT JOIN publications p ON (p.publication_id = a.publication_id)
+				LEFT JOIN submissions s ON (s.submission_id = p.submission_id AND s.current_publication_id = p.publication_id)
 				' .$sqlJoinAuthorSettings .'
 				WHERE s.status = ' . STATUS_PUBLISHED . ' AND
 				' .$sqlWhereAuthorSettings
@@ -100,18 +101,12 @@ class AuthorDAO extends PKPAuthorDAO {
 			$params
 		);
 
-		$publishedSubmissions = array();
-		$publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO');
+		$submissions = [];
 		while (!$result->EOF) {
-			$row = $result->getRowAssoc(false);
-			$publishedSubmission = $publishedSubmissionDao->getBySubmissionId($row['submission_id']);
-			if ($publishedSubmission) {
-				$publishedSubmissions[] = $publishedSubmission;
-			}
-			$result->MoveNext();
+			$submissions[] = Services::get('submission')->get($row['submission_id']);
 		}
-		$result->Close();
-		return $publishedSubmissions;
+
+		return $submissions;
 	}
 
 	/**
@@ -180,7 +175,8 @@ class AuthorDAO extends PKPAuthorDAO {
 				' . $this->getFetchColumns() . '
 			FROM	authors a
 				JOIN user_groups ug ON (a.user_group_id = ug.user_group_id)
-				JOIN submissions s ON (s.submission_id = a.submission_id)
+				JOIN publications p ON (p.publication_id = a.publication_id)
+				JOIN submissions s ON (s.submission_id = p.submission_id AND s.current_publication_id = p.publication_id)
 				' . $this->getFetchJoins() . '
 				JOIN (
 					SELECT
@@ -192,13 +188,14 @@ class AuthorDAO extends PKPAuthorDAO {
 					\' \'
 					' . $sqlColumnsAuthorSettings . '
 					) as names
-					FROM	authors aa
-					JOIN submissions ss ON (ss.submission_id = aa.submission_id AND ss.status = ' . STATUS_PUBLISHED . ')
+					FROM authors aa
+					JOIN publications pp ON (pp.publication_id = aa.publication_id)
+					LEFT JOIN publication_settings ppss ON (ppss.publication_id = pp.publication_id)
+					JOIN submissions ss ON (ss.submission_id = pp.submission_id AND ss.current_publication_id = pp.current_publication_id AND ss.status = ' . STATUS_PUBLISHED . ')
 					JOIN journals j ON (ss.context_id = j.journal_id)
-					JOIN published_submissions ps ON (ps.submission_id = ss.submission_id)
-					JOIN issues i ON (ps.issue_id = i.issue_id AND i.published = 1)
+					JOIN issues i ON (ppss.setting_name="issueId" AND ppss.setting_value = i.issue_id AND i.published = 1)
 					' . $sqlJoinAuthorSettings . '
-					WHERE ps.is_current_submission_version = 1 AND aa.is_current_submission_version = 1 AND j.enabled = 1 AND
+					WHERE j.enabled = 1 AND
 					' . (isset($journalId) ? 'j.journal_id = ?' : '')
 					. $initialSql .'
 					GROUP BY names
@@ -209,14 +206,6 @@ class AuthorDAO extends PKPAuthorDAO {
 		);
 
 		return new DAOResultFactory($result, $this, '_fromRow');
-	}
-
-	/**
-	 * Get a new data object
-	 * @return DataObject
-	 */
-	function newDataObject() {
-		return new Author();
 	}
 }
 

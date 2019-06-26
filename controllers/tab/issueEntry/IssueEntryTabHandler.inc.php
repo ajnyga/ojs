@@ -81,7 +81,7 @@ class IssueEntryTabHandler extends PublicationEntryTabHandler {
 
 		// Remove the file
 		$publicFileManager = new PublicFileManager();
-		if ($publicFileManager->removeContextFile($submission->getJournalId(), $file)) {
+		if ($publicFileManager->removeContextFile($submission->getData('contextId'), $file)) {
 			$json = new JSONMessage(true);
 			$json->setEvent('fileDeleted');
 			return $json;
@@ -101,7 +101,7 @@ class IssueEntryTabHandler extends PublicationEntryTabHandler {
 		$stageId = $this->getStageId();
 		$user = $request->getUser();
 		import('controllers.tab.issueEntry.form.IssueEntryPublicationMetadataForm');
-		$issueEntryPublicationMetadataForm = new IssueEntryPublicationMetadataForm($submission->getId(), $user->getId(), $stageId, array('submissionVersion' => $submission->getSubmissionVersion()));
+		$issueEntryPublicationMetadataForm = new IssueEntryPublicationMetadataForm($submission->getId(), $user->getId(), $stageId);
 		$issueEntryPublicationMetadataForm->initData();
 		return new JSONMessage(true, $issueEntryPublicationMetadataForm->fetch($request));
 	}
@@ -281,7 +281,7 @@ class IssueEntryTabHandler extends PublicationEntryTabHandler {
 
 		$submission = $this->getSubmission();
 		import('controllers.modals.submissionMetadata.form.IssueEntrySubmissionReviewForm');
-		return new IssueEntrySubmissionReviewForm($submission->getId(), $this->getStageId(), array('displayedInContainer' => true, 'submissionVersion' => $submission->getSubmissionVersion()));
+		return new IssueEntrySubmissionReviewForm($submission->getId(), $this->getStageId(), array('displayedInContainer' => true));
 	}
 
 	/**

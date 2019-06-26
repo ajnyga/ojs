@@ -189,7 +189,7 @@
 			{/if}
 
 			{* References *}
-			{if $parsedCitations->getCount() || $article->getCitations()}
+			{* {if $parsedCitations->getCount() || $article->getCitations()}
 				<div class="item references">
 					<h3 class="label">
 						{translate key="submission.citations"}
@@ -204,7 +204,7 @@
 						{/if}
 					</div>
 				</div>
-			{/if}
+			{/if} *}
 
 		</div><!-- .main_entry -->
 

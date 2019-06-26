@@ -154,7 +154,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 					$filter = $this->getIssueFilter();
 					$objectsFileNamePart = 'issues';
 				} elseif (!empty($selectedRepresentations)) {
-					$objects = $this->getArticleGalleys($selectedRepresentations, $context);
+					$objects = $this->getArticleGalleys($selectedRepresentations);
 					$filter = $this->getRepresentationFilter();
 					$objectsFileNamePart = 'galleys';
 				}
@@ -530,7 +530,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 				$objectsFileNamePart = 'issues';
 				break;
 			case 'galleys':
-				$objects = $this->getArticleGalleys($args, $context);
+				$objects = $this->getArticleGalleys($args);
 				$filter = $this->getRepresentationFilter();
 				$objectsFileNamePart = 'galleys';
 				break;
@@ -629,14 +629,13 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 	/**
 	 * Get article galleys from gallley IDs.
 	 * @param $galleyIds array
-	 * @param $context Context
 	 * @return array
 	 */
-	function getArticleGalleys($galleyIds, $context) {
+	function getArticleGalleys($galleyIds) {
 		$galleys = array();
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
 		foreach ($galleyIds as $galleyId) {
-			$articleGalley = $articleGalleyDao->getById($galleyId, null, $context->getId());
+			$articleGalley = $articleGalleyDao->getById($galleyId);
 			if ($articleGalley) $galleys[] = $articleGalley;
 		}
 		return $galleys;

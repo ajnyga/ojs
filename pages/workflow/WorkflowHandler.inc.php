@@ -63,11 +63,21 @@ class WorkflowHandler extends PKPWorkflowHandler {
 	}
 
 	/**
-	 * @see PKPWorkflowHandler::isSubmissionReady()
+	 * @copydoc PKPWorkflowHandler::_getRepresentationsGridUrl()
 	 */
-	protected function isSubmissionReady($submission) {
-		$publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO');
-		return $publishedSubmissionDao->getBySubmissionId($submission->getId())?true:false;
+	protected function _getRepresentationsGridUrl($request, $submission) {
+		return $request->getDispatcher()->url(
+			$request,
+			ROUTE_COMPONENT,
+			null,
+			'grid.articleGalleys.ArticleGalleyGridHandler',
+			'fetchGrid',
+			$submission->getId(),
+			[
+				'submissionId' => $submission->getId(),
+				'publicationId' => '__publicationId__',
+			]
+		);
 	}
 }
 

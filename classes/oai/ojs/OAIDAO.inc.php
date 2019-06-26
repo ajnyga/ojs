@@ -183,11 +183,11 @@ class OAIDAO extends PKPOAIDAO {
 		$record->sets = array(urlencode($journal->getPath()) . ':' . urlencode($section->getLocalizedAbbrev()));
 
 		if ($isRecord) {
-			$publishedSubmission = $this->publishedSubmissionDao->getBySubmissionId($articleId);
+			$submission = Services::get('submission')->get($articleId);
 			$issue = $this->getIssue($row['issue_id']);
-			$galleys = $this->articleGalleyDao->getBySubmissionId($articleId)->toArray();
+			$galleys = $this->articleGalleyDao->getByPublicationId($submission->getCurrentPublication())->toArray();
 
-			$record->setData('article', $publishedSubmission);
+			$record->setData('article', $submission);
 			$record->setData('journal', $journal);
 			$record->setData('section', $section);
 			$record->setData('issue', $issue);

@@ -15,6 +15,5 @@
  * @brief Handle requests for submission API functions.
  *
  */
-
 import('api.v1.submissions.SubmissionHandler');
 return new SubmissionHandler();

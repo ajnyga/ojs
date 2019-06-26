@@ -202,7 +202,7 @@ class SearchHandler extends Handler {
 			$affiliation = $request->getUserVar('affiliation');
 			$country = $request->getUserVar('country');
 
-			$publishedSubmissions = $authorDao->getPublishedSubmissionsForAuthor($journal?$journal->getId():null, $givenName, $familyName, $affiliation, $country);
+			$submissions = $authorDao->getPublishedArticlesForAuthor($journal?$journal->getId():null, $givenName, $familyName, $affiliation, $country);
 
 			// Load information associated with each article.
 			$journals = array();
@@ -214,11 +214,11 @@ class SearchHandler extends Handler {
 			$sectionDao = DAORegistry::getDAO('SectionDAO');
 			$journalDao = DAORegistry::getDAO('JournalDAO');
 
-			foreach ($publishedSubmissions as $article) {
+			foreach ($submissions as $article) {
 				$articleId = $article->getId();
 				$issueId = $article->getIssueId();
 				$sectionId = $article->getSectionId();
-				$journalId = $article->getJournalId();
+				$journalId = $article->getData('contextId');
 
 				if (!isset($journals[$journalId])) {
 					$journals[$journalId] = $journalDao->getById($journalId);
@@ -235,13 +235,13 @@ class SearchHandler extends Handler {
 				}
 			}
 
-			if (empty($publishedSubmissions)) {
+			if (empty($submissions)) {
 				$request->redirect(null, $request->getRequestedPage());
 			}
 
 			$templateMgr = TemplateManager::getManager($request);
 			$templateMgr->assign(array(
-				'publishedSubmissions' => $publishedSubmissions,
+				'submissions' => $submissions,
 				'issues' => $issues,
 				'issuesUnavailable' => $issuesUnavailable,
 				'sections' => $sections,

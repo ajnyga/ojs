@@ -504,7 +504,7 @@ class DataciteXmlFilter extends NativeExportFilter {
 				unset($doi);
 				// Parts: galleys.
 				$galleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $galleyDao ArticleGalleyDAO */
-				$galleysByArticle = $galleyDao->getBySubmissionId($article->getId())->toArray();
+				$galleysByArticle = $galleyDao->getByPublicationId($article->getCurrentPublication()->getId())->toArray();
 				foreach ($galleysByArticle as $relatedGalley) {
 					$doi = $relatedGalley->getStoredPubId('doi');
 					if (!empty($doi)) {

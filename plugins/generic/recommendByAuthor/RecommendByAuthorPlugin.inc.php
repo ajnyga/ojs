@@ -76,7 +76,7 @@ class RecommendByAuthorPlugin extends GenericPlugin {
 				null, $author->getLocalizedGivenName(), $author->getLocalizedFamilyName(),
 				$author->getLocalizedAffiliation(), $author->getCountry()
 			);
-			foreach ($articles as $article) { /* @var $article PublishedSubmission */
+			foreach ($articles as $article) { /* @var $article Submission */
 				if ($displayedArticle->getId() == $article->getId()) continue;
 				$foundArticles[] = $article->getId();
 			}

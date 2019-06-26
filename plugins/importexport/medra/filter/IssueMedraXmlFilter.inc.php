@@ -147,7 +147,7 @@ class IssueMedraXmlFilter extends O4DOIXmlFilter {
 			if (!empty($doi)) $relatedArticleIds[O4DOI_ID_TYPE_DOI] = $doi;
 			$issueNode->appendChild($this->createRelatedNode($doc, 'Work', O4DOI_RELATION_INCLUDES, $relatedArticleIds));
 			// Collect galleys by issue
-			$galleysByArticle = $galleyDao->getBySubmissionId($relatedArticle->getId())->toArray();
+			$galleysByArticle = $galleyDao->getByPublicationId($relatedArticle->getCurrentPublication()->getId())->toArray();
 			$galleysByIssue = array_merge($galleysByIssue, $galleysByArticle);
 			unset($relatedArticle, $relatedArticleIds);
 		}
