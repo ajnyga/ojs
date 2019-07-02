@@ -22,7 +22,7 @@
 				FROM temp_submissions as s
 				LEFT JOIN temp_published_submissions as ps
 					ON (s.submission_id = ps.submission_id)
-				GROUP BY s.submission_id, ps.access_status, ps.date_published, s.last_modified, s.section_id;
+				GROUP BY s.submission_id, ps.access_status, ps.date_published, s.last_modified, s.section_id, s.locale;
 		</query>
 		<query>
 			UPDATE publications as p
@@ -75,7 +75,7 @@
 		</query>
 		<query>
 			INSERT INTO publication_settings(publication_id, locale, setting_name, setting_value)
-				SELECT s.current_publication_id, s.locale, 'citations', ts.citations
+				SELECT s.current_publication_id, ts.locale, 'citations', ts.citations
 				FROM submissions as s
 				LEFT JOIN temp_submissions as ts
 					ON s.submission_id = ts.submission_id
