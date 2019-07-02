@@ -306,7 +306,7 @@ class IssueHandler extends Handler {
 			return $genre->getId();
 		}, $primaryGenres);
 
-		import('lib.pkp.classes.submission.Submission'); // import STATUS_ constants
+		import('classes.article.Submission'); // import STATUS_ constants
 		$issueSubmissions = Services::get('submission')->getMany([
 			'contextId' => $journal->getId(),
 			'issueIds' => [$issue->getId()],
