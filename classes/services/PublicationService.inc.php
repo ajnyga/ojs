@@ -15,6 +15,7 @@
 namespace APP\Services;
 
 use \Application;
+use \Core;
 use \Services;
 use \PKP\Services\PKPPublicationService;
 use DAORegistry;
@@ -168,11 +169,12 @@ class PublicationService extends PKPPublicationService {
 		// If a publication is assigned to an issue, require the issue
 		// to be published before the publication is considered published.
 		if ($isPublished && $publication->getData('issueId')) {
-			if (!isset($dependencies[ASSOC_TYPE_ISSUE])) {
-				return false;
+			if (isset($dependencies[ASSOC_TYPE_ISSUE])) {
+				$issue = $dependencies[ASSOC_TYPE_ISSUE];
+			} else {
+				$issue = Services::get('issue')->get($publication->getData('issueId'));
 			}
-			$issue = $dependencies[ASSOC_TYPE_ISSUE];
-			$isPublished = $issue->getData('published') && $issue->getData('datePublished') < \Core::getCurrentDate();
+			$isPublished = $issue && $issue->getData('published') && strtotime($issue->getData('datePublished')) < strtotime(Core::getCurrentDate());
 		}
 
 		return $isPublished;
