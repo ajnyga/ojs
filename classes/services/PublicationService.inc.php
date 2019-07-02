@@ -17,6 +17,7 @@ namespace APP\Services;
 use \Application;
 use \Services;
 use \PKP\Services\PKPPublicationService;
+use DAORegistry;
 
 class PublicationService extends PKPPublicationService {
 
@@ -59,7 +60,7 @@ class PublicationService extends PKPPublicationService {
 		// Get the section so we can validate section abstract requirements
 		if (!$section && isset($props['id'])) {
 			$publication = Services::get('publication')->get($props['id']);
-			$section = Services::get('section')->get($publication->getData('sectionId'));
+			$section = DAORegistry::getDAO('SectionDAO')->getById($publication->getData('sectionId'));
 		}
 
 		if ($section) {
