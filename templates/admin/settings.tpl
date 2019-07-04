@@ -13,7 +13,7 @@
 <div id="settings-admin-{$uuid}">
 	<tabs>
 		<tab id="setup" name="{translate key="admin.siteSetup"}">
-			<tabs :options="{ useUrlFragment: false }" class="tabs-component--side">
+			<tabs :is-side-tabs="true">
 				<tab name="{translate key="admin.settings"}">
 					<pkp-form
 						v-bind="components.{$smarty.const.FORM_SITE_CONFIG}"
@@ -40,7 +40,7 @@
 			</tabs>
 		</tab>
 		<tab id="appearance" name="{translate key="manager.website.appearance"}">
-			<tabs :options="{ useUrlFragment: false }" class="tabs-component--side">
+			<tabs :is-side-tabs="true">
 				<tab name="{translate key="manager.setup.theme"}">
 					<theme-form
 						v-bind="components.{$smarty.const.FORM_THEME}"
