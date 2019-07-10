@@ -168,4 +168,39 @@ class SubmissionService extends \PKP\Services\PKPSubmissionService {
 			}
 		}
 	}
+
+	/**
+	 * Get submissions ordered by section id
+	 *
+	 * This method replaces PublishedSubmissionDAO::getPublishedSubmissionsInSections()
+	 * which was removed with v3.2.
+	 *
+	 * @param int $issueId
+	 * @param int $contextId
+	 * @return array submissions keyed to a section with some section details
+	 */
+	public function getInSections($issueId, $contextId) {
+
+		$submissions = $this->getMany(['contextId' => $contextId, 'issueIds' => $issueId]);
+		usort($submissions, function($a, $b) {
+			return $a->getCurrentPublication()->getData('seq') <= $b->getCurrentPublication()->getData('seq');
+		});
+
+		$bySections = [];
+		foreach ($submissions as $submission) {
+			$sectionId = $submission->getCurrentPublication()->getData('sectionId');
+			if (empty($bySections[$sectionId])) {
+				$section = \Application::get()->getSectionDao()->getById($sectionId);
+				$bySections[$sectionId] = [
+					'articles' => [],
+					'title' => $section->getData('hideTitle') ? '' : $section->getLocalizedData('title'),
+					'abstractsNotRequired' => $section->getData('abstractsNotRequired'),
+					'hideAuthor' => $section->getData('hideAuthor'),
+				];
+			}
+			$bySections[$sectionId]['articles'][] = $submission;
+		}
+
+		return $bySections;
+	}
 }

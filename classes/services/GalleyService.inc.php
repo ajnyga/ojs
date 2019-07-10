@@ -322,7 +322,23 @@ class GalleyService implements EntityReadInterface, EntityWriteInterface, Entity
 	 */
 	public function delete($galley) {
 		\HookRegistry::call('Galley::delete::before', [$galley]);
+
 		DAORegistry::getDAO('ArticleGalleyDAO')->deleteObject($galley);
+
+		// Delete related submission files
+		$publication = Services::get('publication')->get($galley->getData('publicationId'));
+		$submission = Services::get('submission')->get($publication->getData('submissionId'));
+
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		import('lib.pkp.classes.submission.SubmissionFile'); // Import constants
+		$galleyFiles = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_GALLEY, $galley->getId(), $submission->getId(), SUBMISSION_FILE_PROOF);
+		foreach ($galleyFiles as $file) {
+			// delete dependent files for each galley file
+			$submissionFileDao->deleteAllRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $file->getFileId(), SUBMISSION_FILE_DEPENDENT);
+		}
+		// delete the galley files.
+		$submissionFileDao->deleteAllRevisionsByAssocId(ASSOC_TYPE_GALLEY, $galley->getId(), SUBMISSION_FILE_PROOF);
+
 		\HookRegistry::call('Galley::delete', [$galley]);
 	}
 }

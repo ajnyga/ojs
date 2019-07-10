@@ -69,7 +69,7 @@ class DublinCoreMetaPlugin extends GenericPlugin {
 			$templateMgr->addHeader('dublinCoreAuthor' . $i++, '<meta name="DC.Creator.PersonalName" content="' . htmlspecialchars($author->getFullName(false)) . '"/>');
 		}
 
-		if (is_a($article, 'PublishedSubmission') && ($datePublished = $article->getDatePublished())) {
+		if (is_a($article, 'Submission') && ($datePublished = $article->getDatePublished())) {
 			$templateMgr->addHeader('dublinCoreDateCreated', '<meta name="DC.Date.created" scheme="ISO8601" content="' . strftime('%Y-%m-%d', strtotime($datePublished)) . '"/>');
 		}
 		$templateMgr->addHeader('dublinCoreDateSubmitted', '<meta name="DC.Date.dateSubmitted" scheme="ISO8601" content="' . strftime('%Y-%m-%d', strtotime($article->getDateSubmitted())) . '"/>');
@@ -86,7 +86,7 @@ class DublinCoreMetaPlugin extends GenericPlugin {
 		}
 
 		$i=0;
-		if (is_a($article, 'PublishedSubmission')) foreach($article->getGalleys() as $galley) {
+		if (is_a($article, 'Submission')) foreach($article->getGalleys() as $galley) {
 			if (is_a($galley, 'SupplementaryFile')) continue;
 			$templateMgr->addHeader('dublinCoreFormat' . $i++, '<meta name="DC.Format" scheme="IMT" content="' . htmlspecialchars($galley->getFileType()) . '"/>');
 		}

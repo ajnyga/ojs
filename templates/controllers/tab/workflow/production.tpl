@@ -7,18 +7,6 @@
  *
  * Production workflow stage
  *}
-<script type="text/javascript">
-	// Attach the JS file tab handler.
-	$(function() {ldelim}
-		$('#submissionVersions').pkpHandler(
-			'$.pkp.controllers.TabHandler',
-			{ldelim}
-				{assign var=selectedTabIndex value=$currentSubmissionVersion - 1}
-				selected: {$selectedTabIndex}
-			{rdelim}
-		);
-	{rdelim});
-</script>
 
 {* Help tab *}
 {help file="editorial-workflow/production" class="pkp_help_tab"}

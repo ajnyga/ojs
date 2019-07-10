@@ -167,30 +167,6 @@ class ArticleGalleyDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 	}
 
 	/**
-	 * @copydoc SchemaDAO::deleteById()
-	 */
-	function deleteById($galleyId) {
-
-		// Delete related submission files
-		$galley = $this->getById($galleyId);
-		$publication = Services::get('publication')->get($galley->getData('publicationId'));
-		$submission = Services::get('submission')->get($publication->getData('submissionId'));
-
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-		import('lib.pkp.classes.submission.SubmissionFile'); // Import constants
-
-		$galleyFiles = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_GALLEY, $galleyId, $submission->getId(), SUBMISSION_FILE_PROOF);
-		foreach ($galleyFiles as $file) {
-			// delete dependent files for each galley file
-			$submissionFileDao->deleteAllRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $file->getFileId(), SUBMISSION_FILE_DEPENDENT);
-		}
-		// delete the galley files.
-		$submissionFileDao->deleteAllRevisionsByAssocId(ASSOC_TYPE_GALLEY, $galleyId, SUBMISSION_FILE_PROOF);
-
-		parent::deleteById($galleyId);
-	}
-
-	/**
 	 * @copydoc PKPPubIdPluginDAO::pubIdExists()
 	 */
 	function pubIdExists($pubIdType, $pubId, $excludePubObjectId, $contextId) {
@@ -304,7 +280,8 @@ class ArticleGalleyDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 				'SELECT	sf.*, g.*
 			FROM	submission_galleys g
 				JOIN submissions s ON (s.submission_id = g.submission_id AND s.status <> ' . STATUS_DECLINED .')
-				LEFT JOIN published_submissions ps ON (ps.submission_id = g.submission_id) and (ps.published_submission_version = s.submission_version) and ps.is_current_submission_version = 1
+				LEFT JOIN publications p ON (p.submission_id = g.submission_id)
+				LEFT JOIN publication_settings ps ON (ps.submission_id = g.submission_id)
 				JOIN issues i ON (ps.issue_id = i.issue_id)
 				LEFT JOIN submission_files sf ON (g.file_id = sf.file_id)
 				LEFT JOIN submission_files nsf ON (nsf.file_id = g.file_id AND nsf.revision > sf.revision AND nsf.file_id IS NULL )
@@ -316,15 +293,15 @@ class ArticleGalleyDAO extends SchemaDAO implements PKPPubIdPluginDAO {
 					':'')
 				. ($pubIdSettingName != null?' LEFT JOIN submission_galley_settings gss ON (g.galley_id = gss.galley_id AND gss.setting_name = ?)':'') .'
 			WHERE
-				i.published = 1 AND s.context_id = ? AND g.is_current_submission_version = 1
+				i.published = 1 AND s.context_id = ?
 				' . ($pubIdType != null?' AND gs.setting_name = ? AND gs.setting_value IS NOT NULL':'')
 				. ($title != null?' AND (sst.setting_name = ? AND sst.setting_value LIKE ?)':'')
 				. ($author != null?' AND (asgs.setting_value LIKE ? OR asfs.setting_value LIKE ?)':'')
-				. ($issueId != null?' AND ps.issue_id = ?':'')
+				. ($issueId != null?' AND (ps.setting_name = "issueId" AND ps.setting_value = ?':'')
 				. (($pubIdSettingName != null && $pubIdSettingValue != null && $pubIdSettingValue == EXPORT_STATUS_NOT_DEPOSITED)?' AND gss.setting_value IS NULL':'')
 				. (($pubIdSettingName != null && $pubIdSettingValue != null && $pubIdSettingValue != EXPORT_STATUS_NOT_DEPOSITED)?' AND gss.setting_value = ?':'')
 				. (($pubIdSettingName != null && is_null($pubIdSettingValue))?' AND (gss.setting_value IS NULL OR gss.setting_value = \'\')':'') .'
-				ORDER BY ps.date_published DESC, s.submission_id DESC, g.galley_id DESC',
+				ORDER BY p.date_published DESC, s.submission_id DESC, g.galley_id DESC',
 			$params,
 			$rangeInfo
 		);

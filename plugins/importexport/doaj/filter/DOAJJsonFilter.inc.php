@@ -41,7 +41,7 @@ class DOAJJsonFilter extends NativeImportExportFilter {
 	//
 	/**
 	 * @see Filter::process()
-	 * @param $pubObject PublishedSubmission
+	 * @param $pubObject Submission
 	 * @return JSON string
 	 */
 	function &process(&$pubObject) {

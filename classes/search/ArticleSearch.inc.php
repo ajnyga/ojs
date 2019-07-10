@@ -231,8 +231,6 @@ class ArticleSearch extends SubmissionSearch {
 	 *  issue, journal, section and the issue availability.
 	 */
 	function formatResults($results, $user = null) {
-		$submissionDao = Application::getSubmissionDAO();
-		$publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO');
 		$issueDao = DAORegistry::getDAO('IssueDAO');
 		$contextDao = Application::getContextDAO();
 		$sectionDao = DAORegistry::getDAO('SectionDAO');
@@ -248,8 +246,9 @@ class ArticleSearch extends SubmissionSearch {
 		foreach ($results as $articleId) {
 			// Get the article, storing in cache if necessary.
 			if (!isset($articleCache[$articleId])) {
-				$publishedSubmissionCache[$articleId] = $publishedSubmissionDao->getBySubmissionId($articleId);
-				$articleCache[$articleId] = $submissionDao->getById($articleId);
+				$submission = Services::get('submission')->get($articleId);
+				$publishedSubmissionCache[$articleId] = $submission;
+				$articleCache[$articleId] = $submission;
 			}
 			$article = $articleCache[$articleId];
 			$publishedSubmission = $publishedSubmissionCache[$articleId];
@@ -308,9 +307,8 @@ class ArticleSearch extends SubmissionSearch {
 		// of the submission for a similarity search.
 		if ($result === false) {
 			// Retrieve the article.
-			$publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO'); /* @var $publishedSubmissionDao PublishedSubmissionDAO */
-			$article = $publishedSubmissionDao->getBySubmissionId($submissionId);
-			if (is_a($article, 'PublishedSubmission')) {
+			$article = Services::get('submission')->get($submissionId);
+			if ($article->getData('status') === STATUS_PUBLISHED) {
 				// Retrieve keywords (if any).
 				$searchTerms = $article->getLocalizedSubject();
 				// Tokenize keywords.

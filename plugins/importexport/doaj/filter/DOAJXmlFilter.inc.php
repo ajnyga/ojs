@@ -41,7 +41,7 @@ class DOAJXmlFilter extends NativeExportFilter {
 	//
 	/**
 	 * @see Filter::process()
-	 * @param $pubObjects array Array of PublishedSubmissions
+	 * @param $pubObjects array Array of Submissions
 	 * @return DOMDocument
 	 */
 	function &process(&$pubObjects) {

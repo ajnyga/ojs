@@ -146,11 +146,10 @@ class IssueAction {
 			// that was valid during publication date of requested content
 			if (!$result && $journal->getData('subscriptionExpiryPartial')) {
 				if (isset($articleId)) {
-					$publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO');
-					$publishedSubmission = $publishedSubmissionDao->getBySubmissionId($articleId, null, true);
-					if (isset($publishedSubmission)) {
+					$submission = Services::get('submission')->get($articleId);
+					if ($submission->getData('status') === STATUS_PUBLISHED) {
 						import('classes.subscription.SubscriptionDAO');
-						$result = $subscriptionDao->isValidInstitutionalSubscription($request->getRemoteDomain(), $request->getRemoteAddr(), $journal->getId(), SUBSCRIPTION_DATE_END, $publishedSubmission->getDatePublished());
+						$result = $subscriptionDao->isValidInstitutionalSubscription($request->getRemoteDomain(), $request->getRemoteAddr(), $journal->getId(), SUBSCRIPTION_DATE_END, $submission->getDatePublished());
 					}
 				} else if (isset($issueId)) {
 					$issueDao = DAORegistry::getDAO('IssueDAO');

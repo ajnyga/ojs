@@ -31,21 +31,23 @@ class SubmissionDAO extends PKPSubmissionDAO {
 	 * @copydoc SchemaDAO::deleteById
 	 */
 	function deleteById($submissionId) {
+		$publications = Services::get('publication')->getMany(['submissionIds' => $submissionId]);
+
+		foreach ($publications as $publication) {
+			$galleys = DAORegistry::getDAO('ArticleGalleyDAO')->getByPublicationId($publication->getId())->toArray();
+			foreach ($galleys as $galley) {
+				DAORegistry::getDAO('ArticleGalleyDAO')->deleteById($galley->getId());
+			}
+		}
+
+		DAORegistry::getDAO('ArticleSearchDAO')->deleteSubmissionKeywords($submissionId);
+		DAORegistry::getDAO('CitationDAO')->deleteBySubmissionId($submissionId);
+
+		$articleSearchIndex = Application::getSubmissionSearchIndex();
+		$articleSearchIndex->articleDeleted($submissionId);
+		$articleSearchIndex->submissionChangesFinished();
+
 		parent::deleteById($submissionId);
-
-		// $articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
-		// $articleGalleyDao->deleteByArticleId($submissionId);
-
-		// $articleSearchDao = DAORegistry::getDAO('ArticleSearchDAO');
-		// $articleSearchDao->deleteSubmissionKeywords($submissionId);
-
-		// // Delete article citations.
-		// $citationDao = DAORegistry::getDAO('CitationDAO');
-		// $citationDao->deleteBySubmissionId($submissionId);
-
-		// $articleSearchIndex = Application::getSubmissionSearchIndex();
-		// $articleSearchIndex->articleDeleted($submissionId);
-		// $articleSearchIndex->submissionChangesFinished();
 
 		$this->flushCache();
 	}
@@ -70,7 +72,7 @@ class SubmissionDAO extends PKPSubmissionDAO {
 	 */
 	function removeSubmissionsFromSection($sectionId) {
 		$this->update(
-			'UPDATE submissions SET section_id = null WHERE section_id = ?', (int) $sectionId
+			'DELETE FROM publication_settings WHERE setting_name = "sectionId" AND setting_value = ?', (int) $sectionId
 		);
 
 		$this->flushCache();

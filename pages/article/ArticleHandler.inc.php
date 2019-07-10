@@ -327,7 +327,7 @@ class ArticleHandler extends Handler {
 		$issueAction = new IssueAction();
 
 		$context = $request->getContext();
-		$publishedSubmission = $this->article;
+		$submission = $this->article;
 		$issue = $this->issue;
 		$contextId = $context->getId();
 		$user = $request->getUser();
@@ -335,14 +335,14 @@ class ArticleHandler extends Handler {
 
 		// If this is an editorial user who can view unpublished/unscheduled
 		// articles, bypass further validation. Likewise for its author.
-		if ($publishedSubmission && $issueAction->allowedPrePublicationAccess($context, $publishedSubmission, $user)) {
+		if ($submission && $issueAction->allowedPrePublicationAccess($context, $submission, $user)) {
 			return true;
 		}
 
 		// Make sure the reader has rights to view the article/issue.
-		if ($issue && $issue->getPublished() && $publishedSubmission->getStatus() == STATUS_PUBLISHED) {
+		if ($issue && $issue->getPublished() && $submission->getStatus() == STATUS_PUBLISHED) {
 			$subscriptionRequired = $issueAction->subscriptionRequired($issue, $context);
-			$isSubscribedDomain = $issueAction->subscribedDomain($request, $context, $issue->getId(), $publishedSubmission->getId());
+			$isSubscribedDomain = $issueAction->subscribedDomain($request, $context, $issue->getId(), $submission->getId());
 
 			// Check if login is required for viewing.
 			if (!$isSubscribedDomain && !Validation::isLoggedIn() && $context->getData('restrictArticleAccess') && isset($galleyId) && $galleyId) {
@@ -354,7 +354,7 @@ class ArticleHandler extends Handler {
 			if ( (!$isSubscribedDomain && $subscriptionRequired) && (isset($galleyId) && $galleyId) ) {
 
 				// Subscription Access
-				$subscribedUser = $issueAction->subscribedUser($user, $context, $issue->getId(), $publishedSubmission->getId());
+				$subscribedUser = $issueAction->subscribedUser($user, $context, $issue->getId(), $submission->getId());
 
 				import('classes.payment.ojs.OJSPaymentManager');
 				$paymentManager = Application::get()->getPaymentManager($context);
@@ -365,7 +365,7 @@ class ArticleHandler extends Handler {
 					$purchasedIssue = $completedPaymentDao->hasPaidPurchaseIssue($userId, $issue->getId());
 				}
 
-				if (!(!$subscriptionRequired || $publishedSubmission->getAccessStatus() == ARTICLE_ACCESS_OPEN || $subscribedUser || $purchasedIssue)) {
+				if (!(!$subscriptionRequired || $submission->getAccessStatus() == ARTICLE_ACCESS_OPEN || $subscribedUser || $purchasedIssue)) {
 
 					if ( $paymentManager->purchaseArticleEnabled() || $paymentManager->membershipEnabled() ) {
 						/* if only pdf files are being restricted, then approve all non-pdf galleys
@@ -374,7 +374,7 @@ class ArticleHandler extends Handler {
 
 							if ($this->galley && !$this->galley->isPdfGalley() ) {
 								$this->issue = $issue;
-								$this->article = $publishedSubmission;
+								$this->article = $submission;
 								return true;
 							}
 						}
@@ -387,13 +387,13 @@ class ArticleHandler extends Handler {
 						 * and just let them access the article */
 						$completedPaymentDao = DAORegistry::getDAO('OJSCompletedPaymentDAO');
 						$dateEndMembership = $user->getSetting('dateEndMembership', 0);
-						if ($completedPaymentDao->hasPaidPurchaseArticle($userId, $publishedSubmission->getId())
+						if ($completedPaymentDao->hasPaidPurchaseArticle($userId, $submission->getId())
 							|| (!is_null($dateEndMembership) && $dateEndMembership > time())) {
 							$this->issue = $issue;
-							$this->article = $publishedSubmission;
+							$this->article = $submission;
 							return true;
 						} elseif ($paymentManager->purchaseArticleEnabled()) {
-							$queuedPayment = $paymentManager->createQueuedPayment($request, PAYMENT_TYPE_PURCHASE_ARTICLE, $user->getId(), $publishedSubmission->getId(), $context->getData('purchaseArticleFee'));
+							$queuedPayment = $paymentManager->createQueuedPayment($request, PAYMENT_TYPE_PURCHASE_ARTICLE, $user->getId(), $submission->getId(), $context->getData('purchaseArticleFee'));
 							$paymentManager->queuePayment($queuedPayment);
 
 							$paymentForm = $paymentManager->getPaymentForm($queuedPayment);

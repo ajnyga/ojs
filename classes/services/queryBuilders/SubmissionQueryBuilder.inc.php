@@ -33,6 +33,9 @@ class SubmissionQueryBuilder extends \PKP\Services\QueryBuilders\PKPSubmissionQu
 	 * @return \APP\Services\QueryBuilders\SubmissionQueryBuilder
 	 */
 	public function filterByIssues($issueIds) {
+		if (!is_null($issueIds) && !is_array($issueIds)) {
+			$issueIds = [$issueIds];
+		}
 		$this->issueIds = $issueIds;
 		return $this;
 	}
@@ -45,6 +48,9 @@ class SubmissionQueryBuilder extends \PKP\Services\QueryBuilders\PKPSubmissionQu
 	 * @return \APP\Services\QueryBuilders\SubmissionQueryBuilder
 	 */
 	public function filterBySections($sectionIds) {
+		if (!is_null($sectionIds) && !is_array($sectionIds)) {
+			$sectionIds = [$sectionIds];
+		}
 		$this->sectionIds = $sectionIds;
 		return $this;
 	}
@@ -62,7 +68,7 @@ class SubmissionQueryBuilder extends \PKP\Services\QueryBuilders\PKPSubmissionQu
 			$q->leftJoin('publications as issue_p', 'issue_p.submission_id', '=', 's.submission_id')
 				->leftJoin('publication_settings as issue_ps','issue_p.publication_id','=','issue_ps.publication_id')
 				->where(function($q) use ($issueIds) {
-					$q->where('issue_ps.setting_name', 'issueId');
+					$q->where('issue_ps.setting_name', '=', 'issueId');
 					$q->whereIn('issue_ps.setting_value', $issueIds);
 				});
 		}
@@ -72,7 +78,7 @@ class SubmissionQueryBuilder extends \PKP\Services\QueryBuilders\PKPSubmissionQu
 			$q->leftJoin('publications as section_p', 'section_p.submission_id', '=', 's.submission_id')
 				->leftJoin('publication_settings as section_ps','section_p.publication_id','=','section_ps.publication_id')
 				->where(function($q) use ($sectionIds) {
-					$q->where('section_ps.setting_name', 'sectionId');
+					$q->where('section_ps.setting_name', '=', 'sectionId');
 					$q->whereIn('section_ps.setting_value', $sectionIds);
 				});
 		}

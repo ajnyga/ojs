@@ -92,7 +92,7 @@ abstract class DOIPubIdExportPlugin extends PubObjectsExportPlugin {
 	 * when several DOI registration plug-ins
 	 * are active at the same time.
 	 * @param $context Context
-	 * @param $object Issue|PublishedSubmission|ArticleGalley
+	 * @param $object Issue|Submission|ArticleGalley
 	 * @param $testPrefix string
 	 */
 	function saveRegisteredDoi($context, $object, $testPrefix = '10.1234') {
@@ -127,18 +127,18 @@ abstract class DOIPubIdExportPlugin extends PubObjectsExportPlugin {
 	 */
 	function getUnregisteredArticles($context) {
 		// Retrieve all published submissions that have not yet been registered.
-		$publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO'); /* @var $publishedSubmissionDao PublishedSubmissionDAO */
-		$articles = $publishedSubmissionDao->getExportable(
-			$context->getId(),
-			$this->getPubIdType(),
-			null,
-			null,
-			null,
-			$this->getPluginSettingsPrefix(). '::' . DOI_EXPORT_REGISTERED_DOI,
-			null,
-			null
-		);
-		return $articles->toArray();
+		// $publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO'); /* @var $publishedSubmissionDao PublishedSubmissionDAO */
+		// $articles = $publishedSubmissionDao->getExportable(
+		// 	$context->getId(),
+		// 	$this->getPubIdType(),
+		// 	null,
+		// 	null,
+		// 	null,
+		// 	$this->getPluginSettingsPrefix(). '::' . DOI_EXPORT_REGISTERED_DOI,
+		// 	null,
+		// 	null
+		// );
+		// return $articles->toArray();
 	}
 
 	/**
@@ -175,8 +175,8 @@ abstract class DOIPubIdExportPlugin extends PubObjectsExportPlugin {
 		// Retrieve all galleys that have not yet been registered.
 		$galleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $galleyDao ArticleGalleyDAO */
 		$galleys = $galleyDao->getExportable(
-			$this->getPubIdType(),
 			$context?$context->getId():null,
+			$this->getPubIdType(),
 			null,
 			null,
 			null,
@@ -194,13 +194,12 @@ abstract class DOIPubIdExportPlugin extends PubObjectsExportPlugin {
 	 * @return array
 	 */
 	function getPublishedSubmissions($submissionIds, $context) {
-		$publishedSubmissions = array();
-		$publishedSubmissionDao = DAORegistry::getDAO('PublishedSubmissionDAO');
-		foreach ($submissionIds as $submissionId) {
-			$publishedSubmission = $publishedSubmissionDao->getBySubmissionId($submissionId, $context->getId());
-			if ($publishedSubmission && $publishedSubmission->getStoredPubId('doi')) $publishedSubmissions[] = $publishedSubmission;
-		}
-		return $publishedSubmissions;
+		$submissions = array_map(function($submissionId) {
+			return Services::get('submission')->get($submissionId);
+		}, $submissionIds);
+		return array_filter($submissions, function($submission) {
+			return $submission->getData('status') === STATUS_PUBLISHED && !!$submission->getStoredPubId('doi');
+		});
 	}
 
 	/**
