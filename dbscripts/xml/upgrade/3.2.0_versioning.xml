@@ -31,6 +31,7 @@
 				FROM temp_authors as a
 				WHERE a.submission_id = p.submission_id
 					AND a.primary_contact = 1
+				LIMIT 1
 			)
 		</query>
 
@@ -105,6 +106,7 @@
 				FROM temp_published_submissions as ps
 				LEFT JOIN submissions as s
 					ON ps.submission_id = s.submission_id
+				WHERE s.current_publication_id IS NOT NULL
 		</query>
 		<query>
 			INSERT INTO publication_settings(publication_id, setting_name, setting_value)
@@ -112,6 +114,7 @@
 				FROM temp_published_submissions as ps
 				LEFT JOIN submissions as s
 					ON ps.submission_id = s.submission_id
+				WHERE s.current_publication_id IS NOT NULL
 		</query>
 
 		<!-- coverimage and coverimageAlt text -->
@@ -148,6 +151,7 @@
 				FROM temp_submission_categories as tsc
 				LEFT JOIN submissions as s
 					ON s.submission_id = tsc.submission_id
+				WHERE s.current_publication_id IS NOT NULL
 		</query>
 
 		<!-- move submission_galleys to publication_galleys -->
@@ -161,17 +165,15 @@
 			INSERT INTO publication_galley_settings(galley_id, locale, setting_name, setting_value)
 				SELECT tsgs.galley_id, tsgs.locale, tsgs.setting_name, tsgs.setting_value
 				FROM temp_submission_galley_settings as tsgs
+				WHERE tsgs.galley_id IS NOT NULL
 		</query>
 
 		<!-- connect controlled vocab metadata to publications, 1048585 = ASSOC_TYPE_SUBMISSION, 1048588 = ASSOC_TYPE_PUBLICATION -->
 		<query>
-			UPDATE controlled_vocabs as cv
-			SET cv.assoc_type = 1048588, assoc_id = (
-				SELECT s.current_publication_id
-				FROM submissions as s
-				WHERE s.submission_id = cv.assoc_id
-			)
-			WHERE cv.assoc_type = 1048585
+			UPDATE controlled_vocabs AS cv,
+			          submissions AS s
+			SET cv.assoc_type = 1048588, cv.assoc_id = s.current_publication_id
+			WHERE cv.assoc_type = 1048585 AND s.submission_id = cv.assoc_id
 		</query>
 
 		<!-- remove deprecated and temporary tables. should be last commands -->
