@@ -90,5 +90,9 @@
 	<message key="galley.publicationNotFound">The publication for this galley could not be found.</message>
 	<message key="publication.invalidSection">The section for this publication could not be found.</message>
 	<message key="publication.invalidIssue">The issue for this publication could not be found.</message>
-	<message key="publication.issueEntry.success">The issue entry details have been updated.</message>
+	<message key="publication.journalEntry">Journal Entry</message>
+	<message key="publication.journalEntry.success">The journal entry details have been updated.</message>
+	<message key="publication.required.issue">The publication must be assigned to an issue before it can be published.</message>
+	<message key="publication.publishedIn"><![CDATA[Published in <a href="{$issueUrl}">{$issueName}</a>.]]></message>
+	<message key="publication.scheduledIn"><![CDATA[Scheduled for publication in <a href="{$issueUrl}">{$issueName}</a>.]]></message>
 </locale>

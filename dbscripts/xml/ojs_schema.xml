@@ -516,6 +516,10 @@
 		<field name="submission_id" type="I8">
 			<NOTNULL />
 		</field>
+		<field name="status" type="I1">
+			<NOTNULL/>
+			<DEFAULT VALUE="1"/><!-- STATUS_QUEUED -->
+		</field>
 		<descr>Publications</descr>
 		<index name="publications_submission_id">
 			<col>submission_id</col>

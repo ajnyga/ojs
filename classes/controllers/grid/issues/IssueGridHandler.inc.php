@@ -433,9 +433,10 @@ class IssueGridHandler extends GridHandler {
 		$issue = $this->getAuthorizedContextObject(ASSOC_TYPE_ISSUE);
 		$context = $request->getContext();
 		$contextId = $context->getId();
+		$wasPublished = $issue->getPublished();
 
 		$articleSearchIndex = null;
-		if (!$issue->getPublished()) {
+		if (!$wasPublished) {
 			$confirmationText = __('editor.issues.confirmPublish');
 			import('controllers.grid.pubIds.form.AssignPublicIdentifiersForm');
 			$formTemplate = $this->getAssignPublicIdentifiersFormTemplate();
@@ -448,24 +449,6 @@ class IssueGridHandler extends GridHandler {
 			// Asign pub ids
 			$assignPublicIdentifiersForm->readInputData();
 			$assignPublicIdentifiersForm->execute();
-
-			// Set the status of any attendant queued articles to STATUS_PUBLISHED.
-			$submissions = Services::get('submission')->getMany([
-				'contextId' => $issue->getJournalId(),
-				'issueIds' => $issue->getId(),
-				'count' => 5000, // large upper limit
-			]);
-			foreach ($submissions as $submission) {
-				if ($submission->getData('status') === STATUS_QUEUED) {
-					$submission = Services::get('submission')->edit($submission, ['status' => STATUS_PUBLISHED], $request);
-				}
-				if (!$articleSearchIndex) {
-					$articleSearchIndex = Application::getSubmissionSearchIndex();
-				}
-				$articleSearchIndex->submissionMetadataChanged($submission);
-				// delete article tombstone
-				DAORegistry::getDAO('DataObjectTombstoneDAO')->deleteByDataObjectId($submission->getId());
-			}
 		}
 
 		$issue->setCurrent(1);
@@ -493,6 +476,28 @@ class IssueGridHandler extends GridHandler {
 
 		$issueDao = DAORegistry::getDAO('IssueDAO');
 		$issueDao->updateCurrent($contextId,$issue);
+
+		if (!$wasPublished) {
+			// Publish all related publications
+			$submissions = Services::get('submission')->getMany([
+				'contextId' => $issue->getJournalId(),
+				'issueIds' => $issue->getId(),
+				'status' => STATUS_SCHEDULED,
+				'count' => 5000, // large upper limit
+			]);
+			foreach ($submissions as $submission) {
+				$publication = $submission->getLatestPublication();
+				if ($publication->getData('status') === STATUS_SCHEDULED && $publication->getData('issueId') === (int) $issue->getId()) {
+					$publication = Services::get('publication')->publish($publication);
+				}
+				if (!$articleSearchIndex) {
+					$articleSearchIndex = Application::getSubmissionSearchIndex();
+				}
+				$articleSearchIndex->submissionMetadataChanged($submission);
+				// delete article tombstone
+				DAORegistry::getDAO('DataObjectTombstoneDAO')->deleteByDataObjectId($submission->getId());
+			}
+		}
 
 		if ($articleSearchIndex) $articleSearchIndex->submissionChangesFinished();
 

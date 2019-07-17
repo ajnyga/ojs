@@ -26,9 +26,12 @@ class PublicationService extends PKPPublicationService {
 	 * Initialize hooks for extending PKPPublicationService
 	 */
 	public function __construct() {
-		\HookRegistry::register('Publication::delete', [$this, 'deletePublication']);
 		\HookRegistry::register('Publication::validate', [$this, 'validatePublication']);
+		\HookRegistry::register('Publication::validatePublish', [$this, 'validatePublishPublication']);
 		\HookRegistry::register('Publication::version', [$this, 'versionPublication']);
+		\HookRegistry::register('Publication::publish', [$this, 'publishPublication']);
+		\HookRegistry::register('Publication::unpublish', [$this, 'unpublishPublication']);
+		\HookRegistry::register('Publication::delete', [$this, 'deletePublication']);
 	}
 
 	/**
@@ -51,6 +54,7 @@ class PublicationService extends PKPPublicationService {
 		$primaryLocale = $args[4];
 
 		// Ensure that the specified section exists
+		$section = null;
 		if (isset($props['sectionId'])) {
 			$section = Application::get()->getSectionDAO()->getById($props['sectionId']);
 			if (!$section) {
@@ -110,6 +114,29 @@ class PublicationService extends PKPPublicationService {
 	}
 
 	/**
+	 * Make additional validation checks against publishing requirements
+	 *
+	 * @see PKPPublicationService::validatePublish()
+	 * @param $hookName string
+	 * @param $args array [
+	 *		@option array Validation errors already identified
+	 *		@option Publication The publication to validate
+	 *		@option Submission The submission of the publication being validated
+	 *		@option array The locales accepted for this object
+	 *		@option string The primary locale for this object
+	 * ]
+	 */
+	public function validatePublishPublication($hookName, $args) {
+		$errors =& $args[0];
+		$publication = $args[1];
+
+		// Every publication must be scheduled in an issue
+		if (!$publication->getData('issueId') || !Services::get('issue')->get($publication->getData('issueId'))) {
+			$errors['issueId'] = __('publication.required.issue');
+		}
+	}
+
+	/**
 	 * Copy OJS-specific objects when a new publication version is created
 	 *
 	 * @param $hookName string
@@ -138,6 +165,31 @@ class PublicationService extends PKPPublicationService {
 	}
 
 	/**
+	 * Modify a publication when it is published
+	 *
+	 * @param $hookName string
+	 * @param $args array [
+	 *		@option Publication The new version of the publication
+	 *		@option Publication The old version of the publication
+	 * ]
+	 */
+	public function publishPublication($hookName, $args) {
+		$newPublication = $args[0];
+		$oldPublication = $args[1];
+
+		// In OJS, a publication may be scheduled in a future issue. In such cases,
+		// the datePublished should remain empty and the status should be set to
+		// scheduled.
+		if (!$oldPublication->getData('datePublished')) {
+			$issue = Services::get('issue')->get($newPublication->getData('issueId'));
+			if ($issue && !$issue->getData('published')) {
+				$newPublication->setData('datePublished', '');
+				$newPublication->setData('status', STATUS_SCHEDULED);
+			}
+		}
+	}
+
+	/**
 	 * Delete OJS-specific objects when a publication is deleted
 	 *
 	 * @param $hookName string
@@ -152,31 +204,5 @@ class PublicationService extends PKPPublicationService {
 		foreach ($galleys as $galley) {
 			Services::get('galley')->delete($galley);
 		}
-	}
-
-	/**
-	 * Is this publication published?
-	 *
-	 * @param Publication $publication
-	 * @param array $dependencies [
-	 * 		@option ASSOC_TYPE_ISSUE
-	 * ]
-	 * @return boolean
-	 */
-	public function isPublished($publication, $dependencies = []) {
-		$isPublished = parent::isPublished($publication);
-
-		// If a publication is assigned to an issue, require the issue
-		// to be published before the publication is considered published.
-		if ($isPublished && $publication->getData('issueId')) {
-			if (isset($dependencies[ASSOC_TYPE_ISSUE])) {
-				$issue = $dependencies[ASSOC_TYPE_ISSUE];
-			} else {
-				$issue = Services::get('issue')->get($publication->getData('issueId'));
-			}
-			$isPublished = $issue && $issue->getData('published') && strtotime($issue->getData('datePublished')) < strtotime(Core::getCurrentDate());
-		}
-
-		return $isPublished;
 	}
 }

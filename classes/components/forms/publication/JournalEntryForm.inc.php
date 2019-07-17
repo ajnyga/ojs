@@ -1,12 +1,12 @@
 <?php
 /**
- * @file classes/components/form/publication/IssueEntryForm.inc.php
+ * @file classes/components/form/publication/JournalEntryForm.inc.php
  *
  * Copyright (c) 2014-2019 Simon Fraser University
  * Copyright (c) 2000-2019 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @class IssueEntryForm
+ * @class JournalEntryForm
  * @ingroup classes_controllers_form
  *
  * @brief A preset form for setting a publication's issue, section, categories,
@@ -17,12 +17,13 @@ use \PKP\components\forms\FormComponent;
 use \PKP\components\forms\FieldSelect;
 use \PKP\components\forms\FieldText;
 use \PKP\components\forms\FieldUploadImage;
+use \APP\components\forms\FieldSelectIssue;
 
-define('FORM_ISSUE_ENTRY', 'issueEntry');
+define('FORM_JOURNAL_ENTRY', 'journalEntry');
 
-class IssueEntryForm extends FormComponent {
+class JournalEntryForm extends FormComponent {
 	/** @copydoc FormComponent::$id */
-	public $id = FORM_ISSUE_ENTRY;
+	public $id = FORM_JOURNAL_ENTRY;
 
 	/** @copydoc FormComponent::$method */
 	public $method = 'PUT';
@@ -39,47 +40,33 @@ class IssueEntryForm extends FormComponent {
 	 */
 	public function __construct($action, $locales, $publication, $publicationContext, $baseUrl, $temporaryFileApiUrl) {
 		$this->action = $action;
-		$this->successMessage = __('publication.issueEntry.success');
+		$this->successMessage = __('publication.journalEntry.success');
 		$this->locales = $locales;
 
 		// Issue options
-		$futureIssues = \Services::get('issue')->getMany([
+		$issueOptions = [['value' => '', 'label' => '']];
+		$unpublishedIssues = \Services::get('issue')->getMany([
 			'contextId' => $publicationContext->getId(),
 			'isPublished' => false,
 		]);
-		$backIssues = \Services::get('issue')->getMany([
+		if (!empty($unpublishedIssues)) {
+			$issueOptions[] = ['value' => '', 'label' => '--- ' . __('editor.issues.futureIssues') . ' ---'];
+			foreach ($unpublishedIssues as $issue) {
+				$issueOptions[] = [
+					'value' => (int) $issue->getId(),
+					'label' => $issue->getIssueIdentification(),
+				];
+			}
+		}
+		$publishedIssues = \Services::get('issue')->getMany([
 			'contextId' => $publicationContext->getId(),
 			'isPublished' => true,
 		]);
-		$issueOptions = [
-			[
-				'value' => '',
-				'label' => '------ ' . __('editor.issues.futureIssues') . ' ------',
-			]
-		];
-		foreach ($futureIssues as $issue) {
-			$issueOptions[] = [
-				'value' => $issue->getId(),
-				'label' => $issue->getIssueIdentification(),
-			];
-		}
-		$issueOptions[] = [
-			'value' => '',
-			'label' => '------ ' . __('editor.issues.currentIssue') . ' ------',
-		];
-		foreach ($backIssues as $issue) {
-			if ($issue->getCurrent()) {
+		if (!empty($publishedIssues)) {
+			$issueOptions[] = ['value' => '', 'label' => '--- ' . __('editor.issues.backIssues') . ' ---'];
+			foreach ($publishedIssues as $issue) {
 				$issueOptions[] = [
-					'value' => $issue->getId(),
-					'label' => $issue->getIssueIdentification(),
-				];
-				break;
-			}
-		}
-		foreach ($backIssues as $issue) {
-			if (!$issue->getCurrent()) {
-				$issueOptions[] = [
-					'value' => $issue->getId(),
+					'value' => (int) $issue->getId(),
 					'label' => $issue->getIssueIdentification(),
 				];
 			}
@@ -95,9 +82,10 @@ class IssueEntryForm extends FormComponent {
 			];
 		}
 
-		$this->addField(new FieldSelect('issueId', [
+		$this->addField(new FieldSelectIssue('issueId', [
 				'label' => __('issue.issue'),
 				'options' => $issueOptions,
+				'publicationStatus' => $publication->getData('status'),
 				'value' => $publication->getData('issueId') ? $publication->getData('issueId') : 0,
 			]))
 			->addField(new FieldSelect('sectionId', [
