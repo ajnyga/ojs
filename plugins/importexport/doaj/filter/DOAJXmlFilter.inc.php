@@ -163,7 +163,7 @@ class DOAJXmlFilter extends NativeExportFilter {
 			// Keywords
 			$supportedLocales = array_keys(AppLocale::getSupportedFormLocales());
 			$dao = DAORegistry::getDAO('SubmissionKeywordDAO');
-			$articleKeywords = $dao->getKeywords($pubObject->getId(), $supportedLocales);
+			$articleKeywords = $dao->getKeywords($pubObject->getCurrentPublication()->getId(), $supportedLocales);
 			if (array_key_exists($pubObject->getLocale(), $articleKeywords)) {
 				$keywordsInArticleLocale = $articleKeywords[$pubObject->getLocale()];
 				unset($articleKeywords[$pubObject->getLocale()]);

@@ -31,7 +31,7 @@ class PublicationService extends PKPPublicationService {
 		\HookRegistry::register('Publication::version', [$this, 'versionPublication']);
 		\HookRegistry::register('Publication::publish', [$this, 'publishPublication']);
 		\HookRegistry::register('Publication::unpublish', [$this, 'unpublishPublication']);
-		\HookRegistry::register('Publication::delete', [$this, 'deletePublication']);
+		\HookRegistry::register('Publication::delete::before', [$this, 'deletePublicationBefore']);
 	}
 
 	/**
@@ -190,14 +190,14 @@ class PublicationService extends PKPPublicationService {
 	}
 
 	/**
-	 * Delete OJS-specific objects when a publication is deleted
+	 * Delete OJS-specific objects before a publication is deleted
 	 *
 	 * @param $hookName string
 	 * @param $args array [
 	 *		@option Publication The publication being deleted
 	 * ]
 	 */
-	public function deletePublication($hookName, $args) {
+	public function deletePublicationBefore($hookName, $args) {
 		$publication = $args[0];
 
 		$galleys = Services::get('galley')->getMany(['publicationIds' => $publication->getId()]);

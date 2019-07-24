@@ -100,7 +100,7 @@ class GoogleScholarPlugin extends GenericPlugin {
 
 		$i=0;
 		$dao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		$keywords = $dao->getKeywords($article->getId(), array(AppLocale::getLocale()));
+		$keywords = $dao->getKeywords($article->getCurrentPublication()->getId(), array(AppLocale::getLocale()));
 		foreach ($keywords as $locale => $localeKeywords) {
 			foreach ($localeKeywords as $keyword) {
 				$templateMgr->addHeader('googleScholarKeyword' . $i++, '<meta name="citation_keywords" xml:lang="' . htmlspecialchars(substr($locale, 0, 2)) . '" content="' . htmlspecialchars($keyword) . '"/>');

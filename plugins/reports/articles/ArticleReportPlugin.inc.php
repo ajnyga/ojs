@@ -188,19 +188,19 @@ class ArticleReportPlugin extends ReportPlugin {
 				case $index == 'source': $columns[$index] = $article->getSource($article->getLocale()); break;
 				case $index == 'type': $columns[$index] = $article->getLocalizedType(); break;
 				case $index == 'subjects':
-					$subjects = $submissionSubjectDao->getSubjects($article->getId(), array($article->getLocale()));
+					$subjects = $submissionSubjectDao->getSubjects($article->getCurrentPublication()->getId(), array($article->getLocale()));
 					$columns[$index] = join(', ', $subjects[$article->getLocale()]);
 					break;
 				case $index == 'disciplines':
-					$disciplines = $submissionDisciplineDao->getDisciplines($article->getId(), array($article->getLocale()));
+					$disciplines = $submissionDisciplineDao->getDisciplines($article->getCurrentPublication()->getId(), array($article->getLocale()));
 					$columns[$index] = join(', ', $disciplines[$article->getLocale()]);
 					break;
 				case $index == 'keywords':
-					$keywords = $submissionKeywordDao->getKeywords($article->getId(), array($article->getLocale()));
+					$keywords = $submissionKeywordDao->getKeywords($article->getCurrentPublication()->getId(), array($article->getLocale()));
 					$columns[$index] = join(', ', $keywords[$article->getLocale()]);
 					break;
 				case $index == 'agencies':
-					$agencies = $submissionAgencyDao->getAgencies($article->getId(), array($article->getLocale()));
+					$agencies = $submissionAgencyDao->getAgencies($article->getCurrentPublication()->getId(), array($article->getLocale()));
 					$columns[$index] = join(', ', $agencies[$article->getLocale()]);
 					break;
 				case $index == 'date_submitted': $columns[$index] = $article->getDateSubmitted(); break;

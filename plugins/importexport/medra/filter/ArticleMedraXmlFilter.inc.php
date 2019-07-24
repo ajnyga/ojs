@@ -236,7 +236,7 @@ class ArticleMedraXmlFilter extends O4DOIXmlFilter {
 		// Article keywords
 		// SubjectClass will be left out here, because we don't know the scheme/classification name
 		$submissionKeywordDao = DAORegistry::getDAO('SubmissionKeywordDAO');
-		$allKeywords = $submissionKeywordDao->getKeywords($article->getId(), $context->getSupportedSubmissionLocales());
+		$allKeywords = $submissionKeywordDao->getKeywords($article->getCurrentPublication()->getId(), $context->getSupportedSubmissionLocales());
 		$keywords = $this->getPrimaryTranslation($allKeywords, $objectLocalePrecedence);
 		if (!empty($keywords)) {
 			$keywordsString = implode(';', $keywords);
