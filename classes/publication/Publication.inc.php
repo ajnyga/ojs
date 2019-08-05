@@ -13,8 +13,8 @@
  *
  * @brief Class for Publication.
  */
-import('lib.pkp.classes.publication.Publication');
+import('lib.pkp.classes.publication.PKPPublication');
 
-class PKPPublication extends Publication {}
+class Publication extends PKPPublication {}
 
 
