@@ -50,6 +50,7 @@ class OJSMigration extends Migration
         Schema::create('sections', function (Blueprint $table) {
             $table->bigInteger('section_id')->autoIncrement();
             $table->bigInteger('journal_id');
+            $table->string('path', 255);
             $table->bigInteger('review_form_id')->nullable();
             $table->float('seq', 8, 2)->default(0);
             $table->smallInteger('editor_restricted')->default(0);

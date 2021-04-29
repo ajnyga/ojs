@@ -27,6 +27,14 @@
 			{fbvElement type="text" multilingual=true id="abbrev" label="section.abbreviation" value=$abbrev maxlength="80" size=$fbvStyles.size.SMALL inline=true required=true}
 		{/fbvFormSection}
 
+		{fbvFormSection}
+			{fbvElement type="text" id="path" required=true value=$path label="section.pathDescription"}
+		{/fbvFormSection}
+
+		{fbvFormSection title="section.description"}
+			{fbvElement type="textarea" multilingual=true id="description" value=$description rich=true}
+		{/fbvFormSection}
+
 		{fbvFormSection title="manager.sections.policy" for="policy"}
 			{fbvElement type="textarea" multilingual=true id="policy" value=$policy rich=true}
 		{/fbvFormSection}
