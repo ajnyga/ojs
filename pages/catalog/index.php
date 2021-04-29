@@ -20,6 +20,7 @@ switch ($op) {
     case 'category':
     case 'fullSize':
     case 'thumbnail':
-        define('HANDLER_CLASS', 'PKP\pages\catalog\PKPCatalogHandler');
+        define('HANDLER_CLASS', 'CatalogHandler');
+        import('pages.catalog.CatalogHandler');
         break;
 }

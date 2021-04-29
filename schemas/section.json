@@ -6,6 +6,10 @@
 			"type": "integer",
 			"apiSummary": true
 		},
+		"path": {
+			"type": "string",
+			"apiSummary": true
+		},
 		"abbrev": {
 			"$ref": "#/definitions/LocaleObject",
 			"apiSummary": true

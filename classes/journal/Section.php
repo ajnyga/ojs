@@ -80,6 +80,59 @@ class Section extends PKPSection
     }
 
     /**
+     * Get section path.
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->getData('path');
+    }
+
+    /**
+     * Set section path.
+     *
+     * @param $path string
+     */
+    public function setPath($path)
+    {
+        return $this->setData('path', $path);
+    }
+
+    /**
+     * Get localized section description.
+     *
+     * @return string
+     */
+    public function getLocalizedDescription()
+    {
+        return $this->getLocalizedData('description');
+    }
+
+    /**
+     * Get description of section.
+     *
+     * @param $locale string
+     *
+     * @return string
+     */
+    public function getDescription($locale)
+    {
+        return $this->getData('description', $locale);
+    }
+
+    /**
+     * Set description of section.
+     *
+     * @param $description string
+     * @param $locale string
+     */
+    public function setDescription($description, $locale)
+    {
+        $this->setData('description', $description, $locale);
+    }
+
+    /**
      * Get abstract word count limit.
      *
      * @return int

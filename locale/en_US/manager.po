@@ -284,6 +284,9 @@ msgstr ""
 msgid "manager.sections.form.abbrevRequired"
 msgstr "An abbreviated title is required for the section"
 
+msgid "manager.setup.form.section.pathAlphaNumeric"
+msgstr "The series path must consist of only letters and numbers."
+
 msgid "manager.sections.form.mustAllowPermission"
 msgstr "Please ensure that at least one checkbox is checked for each Section Editor assignment."
 
