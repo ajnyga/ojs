@@ -14,10 +14,10 @@
  *
  */
 
-use PKP\submission\PKPSubmission;
+use APP\handler\Handler;
 
 use APP\template\TemplateManager;
-use APP\handler\Handler;
+use PKP\submission\PKPSubmission;
 
 class SectionsHandler extends Handler
 {

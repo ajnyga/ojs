@@ -15,6 +15,6 @@
 
 import('classes.handler.Handler');
 
-class ArticlesHandler extends Handler {
-
+class ArticlesHandler extends Handler
+{
 }

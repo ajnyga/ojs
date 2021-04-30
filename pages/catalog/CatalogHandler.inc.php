@@ -13,9 +13,10 @@
  * @brief Redirect requests to old catalog handler
  */
 
+use APP\handler\Handler;
+
 class CatalogHandler extends Handler
 {
-
     /**
      * Redirect calls to category
      * https://github.com/pkp/pkp-lib/issues/5932
@@ -49,5 +50,4 @@ class CatalogHandler extends Handler
         header('HTTP/1.1 301 Moved Permanently');
         $request->redirect(null, 'articles', 'thumbnail', [$args[0]], ['type' => $request->getUserVar('type')]);
     }
-
 }

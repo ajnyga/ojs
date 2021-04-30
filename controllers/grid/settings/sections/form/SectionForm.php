@@ -25,7 +25,6 @@ use PKP\security\Validation;
 
 class SectionForm extends PKPSectionForm
 {
-
     /** @var int $_pressId */
     public $_journalId;
 
