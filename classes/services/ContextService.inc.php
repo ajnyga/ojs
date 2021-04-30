@@ -15,6 +15,10 @@
 
 namespace APP\Services;
 
+use PKP\file\TemporaryFileManager;
+
+use APP\file\PublicFileManager;
+
 class ContextService extends \PKP\Services\PKPContextService
 {
     /** @copydoc \PKP\Services\PKPContextService::$contextsFileDirName */
