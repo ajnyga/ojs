@@ -17,20 +17,18 @@
  */
 
 switch ($op) {
-	case 'index':
-		define('HANDLER_CLASS', 'ArticlesHandler');
-		import('pages.articles.ArticlesHandler');
-		break;
-	case 'category':
-	case 'fullSize':
-	case 'thumbnail':
-		define('HANDLER_CLASS', 'PKPCatalogHandler');
-		import('lib.pkp.pages.catalog.PKPCatalogHandler');
-		break;
-	case 'section':
-		define('HANDLER_CLASS', 'SectionsHandler');
-		import('pages.articles.SectionsHandler');
-		break;
+    case 'index':
+        define('HANDLER_CLASS', 'ArticlesHandler');
+        import('pages.articles.ArticlesHandler');
+        break;
+    case 'category':
+    case 'fullSize':
+    case 'thumbnail':
+        define('HANDLER_CLASS', 'PKPCatalogHandler');
+        import('lib.pkp.pages.catalog.PKPCatalogHandler');
+        break;
+    case 'section':
+        define('HANDLER_CLASS', 'SectionsHandler');
+        import('pages.articles.SectionsHandler');
+        break;
 }
-
-

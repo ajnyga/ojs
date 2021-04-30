@@ -15,11 +15,10 @@
 
 import('lib.pkp.controllers.grid.settings.sections.form.PKPSectionForm');
 
-use \APP\template\TemplateManager;
+use APP\template\TemplateManager;
 
 class SectionForm extends PKPSectionForm
 {
-
     /** @var int $_pressId */
     public $_journalId;
 

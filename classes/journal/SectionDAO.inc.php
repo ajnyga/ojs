@@ -15,8 +15,8 @@
  * @brief Operations for retrieving and modifying Section objects.
  */
 
-use PKP\submission\PKPSubmission;
 use PKP\context\PKPSectionDAO;
+use PKP\submission\PKPSubmission;
 
 import('classes.journal.Section');
 
