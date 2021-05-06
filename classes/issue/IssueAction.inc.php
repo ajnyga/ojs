@@ -48,41 +48,6 @@ class IssueAction
     }
 
     /**
-     * Checks if this user is granted reader access to pre-publication articles
-     * based on their roles in the journal (i.e. Manager, Editor, etc).
-     *
-     * @param $journal Journal
-     * @param $submission Submission
-     * @param $user User
-     *
-     * @return bool
-     */
-    public function allowedPrePublicationAccess($journal, $submission, $user)
-    {
-        // Don't grant access until submission reaches Copyediting stage
-        if ($submission->getData('stageId') < WORKFLOW_STAGE_ID_EDITING) {
-            return false;
-        }
-
-        if ($this->_roleAllowedPrePublicationAccess($journal, $user)) {
-            return true;
-        }
-
-        if ($user && $journal) {
-            $journalId = $journal->getId();
-            $userId = $user->getId();
-
-            $stageAssignmentDao = DAORegistry::getDAO('StageAssignmentDAO'); /* @var $stageAssignmentDao StageAssignmentDAO */
-            $stageAssignments = $stageAssignmentDao->getBySubmissionAndRoleId($submission->getId(), ROLE_ID_AUTHOR, null, $userId);
-            $stageAssignment = $stageAssignments->next();
-            if ($stageAssignment) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Checks if this user is granted access to pre-publication issue galleys
      * based on their roles in the journal (i.e. Manager, Editor, etc).
      *
@@ -92,7 +57,25 @@ class IssueAction
      */
     public function allowedIssuePrePublicationAccess($journal, $user)
     {
-        return $this->_roleAllowedPrePublicationAccess($journal, $user);
+        $roleDao = DAORegistry::getDAO('RoleDAO'); /* @var $roleDao RoleDAO */
+        if ($user && $journal) {
+            $journalId = $journal->getId();
+            $userId = $user->getId();
+            $subscriptionAssumedRoles = [
+                ROLE_ID_MANAGER,
+                ROLE_ID_SUB_EDITOR,
+                ROLE_ID_ASSISTANT,
+                ROLE_ID_SUBSCRIPTION_MANAGER
+            ];
+
+            $roles = $roleDao->getByUserId($userId, $journalId);
+            foreach ($roles as $role) {
+                if (in_array($role->getRoleId(), $subscriptionAssumedRoles)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -112,7 +95,7 @@ class IssueAction
         $submission = $submissionDao->getById($articleId);
         $result = false;
         if (isset($user) && isset($journal)) {
-            if ($submission && $this->allowedPrePublicationAccess($journal, $submission, $user)) {
+            if ($submission && Services::get('submission')->canPreview($user, $submission)) {
                 $result = true;
             } else {
                 $result = $subscriptionDao->isValidIndividualSubscription($user->getId(), $journal->getId());
@@ -182,37 +165,5 @@ class IssueAction
         }
         HookRegistry::call('IssueAction::subscribedDomain', [&$request, &$journal, &$issueId, &$articleId, &$result]);
         return (bool) $result;
-    }
-
-    /**
-     * Checks if this user is granted access to pre-publication galleys based on role
-     * based on their roles in the journal (i.e. Manager, Editor, etc).
-     *
-     * @param $journal Journal
-     * @param $user User
-     *
-     * @return bool
-     */
-    public function _roleAllowedPrePublicationAccess($journal, $user)
-    {
-        $roleDao = DAORegistry::getDAO('RoleDAO'); /* @var $roleDao RoleDAO */
-        if ($user && $journal) {
-            $journalId = $journal->getId();
-            $userId = $user->getId();
-            $subscriptionAssumedRoles = [
-                ROLE_ID_MANAGER,
-                ROLE_ID_SUB_EDITOR,
-                ROLE_ID_ASSISTANT,
-                ROLE_ID_SUBSCRIPTION_MANAGER
-            ];
-
-            $roles = $roleDao->getByUserId($userId, $journalId);
-            foreach ($roles as $role) {
-                if (in_array($role->getRoleId(), $subscriptionAssumedRoles)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

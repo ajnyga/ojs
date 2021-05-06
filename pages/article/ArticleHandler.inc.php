@@ -109,12 +109,7 @@ class ArticleHandler extends Handler
             }
         }
 
-        import('classes.issue.IssueAction');
-        $issueAction = new IssueAction();
-        $context = $request->getContext();
-        $user = $request->getUser();
-
-        if (!$submission || ($submission->getData('status') !== PKPSubmission::STATUS_PUBLISHED && !$issueAction->allowedPrePublicationAccess($context, $submission, $user))) {
+        if (!$submission || ($submission->getData('status') !== PKPSubmission::STATUS_PUBLISHED && !Services::get('submission')->canPreview($request->getUser(), $submission))) {
             $request->getDispatcher()->handle404();
         }
 
@@ -146,7 +141,7 @@ class ArticleHandler extends Handler
             $galleyId = $subPath;
         }
 
-        if ($this->publication->getData('status') !== PKPSubmission::STATUS_PUBLISHED && !$issueAction->allowedPrePublicationAccess($context, $submission, $user)) {
+        if ($this->publication->getData('status') !== PKPSubmission::STATUS_PUBLISHED && !Services::get('submission')->canPreview($request->getUser(), $submission)) {
             $request->getDispatcher()->handle404();
         }
 
@@ -486,7 +481,7 @@ class ArticleHandler extends Handler
 
         // If this is an editorial user who can view unpublished/unscheduled
         // articles, bypass further validation. Likewise for its author.
-        if ($submission && $issueAction->allowedPrePublicationAccess($context, $submission, $user)) {
+        if ($submission && Services::get('submission')->canPreview($user, $submission)) {
             return true;
         }
 
