@@ -256,11 +256,6 @@ msgstr "Agendar para Número"
 msgid "publication.unscheduledIn"
 msgstr "Este artigo não foi agendado para publicação em um número."
 
-msgid "submission.viewingPreview"
-msgstr ""
-"Isto é uma visualização prévia e não foi ainda publicado.  <a href=\"{$url}\""
-">Ver submissão</a>"
-
 msgid "publication.inactiveSection"
 msgstr "{$section} (Inativa)"
 

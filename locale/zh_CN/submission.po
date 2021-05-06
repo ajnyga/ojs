@@ -292,6 +292,3 @@ msgstr "发布"
 
 msgid "publication.inactiveSection"
 msgstr "{$section}(不活跃)"
-
-msgid "submission.viewingPreview"
-msgstr "这仅是预览，并没有被发布。<a href=\"{$url}\">查看提交</a>"
