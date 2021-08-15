@@ -28,7 +28,7 @@
 		{/fbvFormSection}
 
 		{fbvFormSection}
-			{fbvElement type="text" id="path" required=true value=$path label="section.pathDescription"}
+			{fbvElement type="text" id="urlPath" required=true value=$urlPath label="section.urlPathDescription"}
 		{/fbvFormSection}
 
 		{fbvFormSection title="section.description"}

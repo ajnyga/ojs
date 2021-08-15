@@ -90,7 +90,7 @@
 		<field name="journal_id" type="I8">
 			<NOTNULL/>
 		</field>
-		<field name="path" type="C2" size="255">
+		<field name="url_path" type="C2" size="255">
 			<NOTNULL />
 		</field>
 		<field name="review_form_id" type="I8" />

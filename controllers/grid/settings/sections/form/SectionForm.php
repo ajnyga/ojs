@@ -47,8 +47,8 @@ class SectionForm extends PKPSectionForm
         // Validation checks for this form
         $this->addCheck(new \PKP\form\validation\FormValidatorLocale($this, 'title', 'required', 'manager.setup.form.section.nameRequired'));
         $this->addCheck(new \PKP\form\validation\FormValidatorLocale($this, 'abbrev', 'required', 'manager.sections.form.abbrevRequired'));
-        $this->addCheck(new \PKP\form\validation\FormValidator($this, 'path', 'required', 'manager.setup.form.section.pathRequired'));
-        $this->addCheck(new \PKP\form\validation\FormValidatorRegExp($this, 'path', 'required', 'manager.setup.form.section.pathAlphaNumeric', '/^[a-zA-Z0-9\/._-]+$/'));
+        $this->addCheck(new \PKP\form\validation\FormValidator($this, 'urlPath', 'required', 'manager.setup.form.section.urlPathRequired'));
+        $this->addCheck(new \PKP\form\validation\FormValidatorRegExp($this, 'urlPath', 'required', 'manager.setup.form.section.urlPathAlphaNumeric', '/^[a-zA-Z0-9\/._-]+$/'));
         $journal = $request->getJournal();
         $this->addCheck(new \PKP\form\validation\FormValidatorCustom($this, 'reviewFormId', 'optional', 'manager.sections.form.reviewFormId', [DAORegistry::getDAO('ReviewFormDAO'), 'reviewFormExists'], [ASSOC_TYPE_JOURNAL, $journal->getId()]));
     }
@@ -80,7 +80,7 @@ class SectionForm extends PKPSectionForm
                 'editorRestriction' => $section->getEditorRestricted(),
                 'hideTitle' => $section->getHideTitle(),
                 'hideAuthor' => $section->getHideAuthor(),
-                'path' => $section->getPath(),
+                'urlPath' => $section->getUrlPath(),
                 'description' => $section->getDescription(null),
                 'policy' => $section->getPolicy(null), // Localized
                 'wordCount' => $section->getAbstractWordCount(),
@@ -156,12 +156,12 @@ class SectionForm extends PKPSectionForm
     public function readInputData()
     {
         parent::readInputData();
-        $this->readUserVars(['abbrev', 'path', 'description', 'policy', 'reviewFormId', 'identifyType', 'isInactive', 'metaIndexed', 'metaReviewed', 'abstractsNotRequired', 'editorRestriction', 'hideTitle', 'hideAuthor', 'wordCount']);
+        $this->readUserVars(['abbrev', 'urlPath', 'description', 'policy', 'reviewFormId', 'identifyType', 'isInactive', 'metaIndexed', 'metaReviewed', 'abstractsNotRequired', 'editorRestriction', 'hideTitle', 'hideAuthor', 'wordCount']);
         // For path duplicate checking; excuse the current path.
         if ($sectionId = $this->getSectionId()) {
             $sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SeriesDAO */
             $section = $sectionDao->getById($sectionId, $this->_journalId);
-            $this->setData('oldPath', $section->getPath());
+            $this->setData('oldPath', $section->getUrlPath());
         }
     }
 
@@ -196,7 +196,7 @@ class SectionForm extends PKPSectionForm
         // Populate/update the section object from the form
         $section->setTitle($this->getData('title'), null); // Localized
         $section->setAbbrev($this->getData('abbrev'), null); // Localized
-        $section->setPath($this->getData('path'));
+        $section->setUrlPath($this->getData('urlPath'));
         $section->setDescription($this->getData('description'), null); // Localized
         $reviewFormId = $this->getData('reviewFormId');
         if ($reviewFormId === '') {

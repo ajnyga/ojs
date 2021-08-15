@@ -6,7 +6,7 @@
 			"type": "integer",
 			"apiSummary": true
 		},
-		"path": {
+		"urlPath": {
 			"type": "string",
 			"apiSummary": true
 		},

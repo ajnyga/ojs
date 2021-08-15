@@ -204,7 +204,7 @@ class SectionDAO extends PKPSectionDAO
 
         $section->setId($row['section_id']);
         $section->setJournalId($row['journal_id']);
-        $section->setPath($row['path']);
+        $section->setUrlPath($row['url_path']);
         $section->setMetaIndexed($row['meta_indexed']);
         $section->setMetaReviewed($row['meta_reviewed']);
         $section->setAbstractsNotRequired($row['abstracts_not_required']);
@@ -258,13 +258,13 @@ class SectionDAO extends PKPSectionDAO
     {
         $this->update(
             'INSERT INTO sections
-				(journal_id, review_form_id, path, seq, meta_indexed, meta_reviewed, abstracts_not_required, editor_restricted, hide_title, hide_author, is_inactive, abstract_word_count)
+				(journal_id, review_form_id, url_path, seq, meta_indexed, meta_reviewed, abstracts_not_required, editor_restricted, hide_title, hide_author, is_inactive, abstract_word_count)
 				VALUES
 				(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 (int)$section->getJournalId(),
                 (int)$section->getReviewFormId(),
-                $section->getPath(),
+                $section->getUrlPath(),
                 (float) $section->getSequence(),
                 $section->getMetaIndexed() ? 1 : 0,
                 $section->getMetaReviewed() ? 1 : 0,
@@ -293,7 +293,7 @@ class SectionDAO extends PKPSectionDAO
             'UPDATE sections
 				SET
 					review_form_id = ?,
-                    path = ?,
+                    url_path = ?,
 					seq = ?,
 					meta_indexed = ?,
 					meta_reviewed = ?,
@@ -306,7 +306,7 @@ class SectionDAO extends PKPSectionDAO
 				WHERE section_id = ?',
             [
                 (int)$section->getReviewFormId(),
-                $section->getPath(),
+                $section->getUrlPath(),
                 (float) $section->getSequence(),
                 (int)$section->getMetaIndexed(),
                 (int)$section->getMetaReviewed(),

@@ -52,7 +52,7 @@ class SectionsHandler extends Handler
      */
     public function section($args, $request)
     {
-        $sectionPath = $args[0] ?? null;
+        $sectionUrlPath = $args[0] ?? null;
         $page = isset($args[1]) && ctype_digit((string) $args[1]) ? (int) $args[1] : 1;
         $context = $request->getContext();
         $contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
@@ -64,7 +64,7 @@ class SectionsHandler extends Handler
             exit;
         }
 
-        if (!$sectionPath || !$contextId) {
+        if (!$sectionUrlPath || !$contextId) {
             $request->getDispatcher()->handle404();
             exit;
         }
@@ -74,7 +74,7 @@ class SectionsHandler extends Handler
 
         $sectionExists = false;
         while ($section = $sections->next()) {
-            if ($section->getData('path') === $sectionPath) {
+            if ($section->getData('urlPath') === $sectionUrlPath) {
                 $sectionExists = true;
                 break;
             }
@@ -117,7 +117,7 @@ class SectionsHandler extends Handler
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->assign([
             'section' => $section,
-            'sectionPath' => $sectionPath,
+            'sectionUrlPath' => $sectionUrlPath,
             'submissions' => $submissions,
             'showingStart' => $showingStart,
             'showingEnd' => $showingEnd,

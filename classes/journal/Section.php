@@ -80,23 +80,23 @@ class Section extends PKPSection
     }
 
     /**
-     * Get section path.
+     * Get section url path.
      *
      * @return string
      */
-    public function getPath()
+    public function getUrlPath()
     {
-        return $this->getData('path');
+        return $this->getData('urlPath');
     }
 
     /**
-     * Set section path.
+     * Set section url path.
      *
      * @param $path string
      */
-    public function setPath($path)
+    public function setUrlPath($urlPath)
     {
-        return $this->setData('path', $path);
+        return $this->setData('urlPath', $urlPath);
     }
 
     /**
