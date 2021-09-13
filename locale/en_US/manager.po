@@ -314,6 +314,9 @@ msgstr "Indexed"
 msgid "manager.sections.noneCreated"
 msgstr "No sections have been created."
 
+msgid "manager.sections.notBrowsable"
+msgstr "Disable the page that allows readers to browse all publications in this section"
+
 msgid "manager.sections.open"
 msgstr "Open Submissions"
 

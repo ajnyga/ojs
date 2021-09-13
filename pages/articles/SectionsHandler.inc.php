@@ -80,7 +80,8 @@ class SectionsHandler extends Handler
             }
         }
 
-        if (!$sectionExists) {
+        // If section does not exist or is not browsable
+        if (!$sectionExists || $section->getNotBrowsable()) {
             $request->getDispatcher()->handle404();
             exit;
         }

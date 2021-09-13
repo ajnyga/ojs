@@ -304,6 +304,26 @@ class Section extends PKPSection
     {
         $this->setData('isInactive', $isInactive);
     }
+
+    /**
+      * Return boolean indicating if section is browsable.
+      *
+      * @return int
+      */
+    public function getNotBrowsable()
+    {
+        return $this->getData('notBrowsable');
+    }
+
+    /**
+     * Set if section is browsable.
+     *
+     * @param $isInactive int
+     */
+    public function setNotBrowsable($notBrowsable)
+    {
+        $this->setData('notBrowsable', $notBrowsable);
+    }
 }
 
 if (!PKP_STRICT_MODE) {

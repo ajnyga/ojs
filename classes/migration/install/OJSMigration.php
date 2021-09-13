@@ -65,6 +65,7 @@ class OJSMigration extends \PKP\migration\Migration
             $table->smallInteger('hide_title')->default(0);
             $table->smallInteger('hide_author')->default(0);
             $table->smallInteger('is_inactive')->default(0);
+            $table->smallInteger('not_browsable')->default(0);
             $table->bigInteger('abstract_word_count')->nullable();
             $table->index(['journal_id'], 'sections_journal_id');
         });

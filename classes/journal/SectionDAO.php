@@ -211,6 +211,7 @@ class SectionDAO extends PKPSectionDAO
         $section->setHideTitle($row['hide_title']);
         $section->setHideAuthor($row['hide_author']);
         $section->setIsInactive($row['is_inactive']);
+        $section->setNotBrowsable($row['not_browsable']);
         $section->setAbstractWordCount($row['abstract_word_count']);
 
         $this->getDataObjectSettings('section_settings', 'section_id', $row['section_id'], $section);
@@ -258,7 +259,7 @@ class SectionDAO extends PKPSectionDAO
     {
         $this->update(
             'INSERT INTO sections
-				(journal_id, review_form_id, url_path, seq, meta_indexed, meta_reviewed, abstracts_not_required, editor_restricted, hide_title, hide_author, is_inactive, abstract_word_count)
+				(journal_id, review_form_id, url_path, seq, meta_indexed, meta_reviewed, abstracts_not_required, editor_restricted, hide_title, hide_author, is_inactive, not_browsable, abstract_word_count)
 				VALUES
 				(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
@@ -273,6 +274,7 @@ class SectionDAO extends PKPSectionDAO
                 $section->getHideTitle() ? 1 : 0,
                 $section->getHideAuthor() ? 1 : 0,
                 $section->getIsInactive() ? 1 : 0,
+                $section->getNotBrowsable() ? 1 : 0,
                 (int) $section->getAbstractWordCount()
             ]
         );
@@ -302,6 +304,7 @@ class SectionDAO extends PKPSectionDAO
 					hide_title = ?,
 					hide_author = ?,
 					is_inactive = ?,
+                    not_browsable = ?,
 					abstract_word_count = ?
 				WHERE section_id = ?',
             [
@@ -315,6 +318,7 @@ class SectionDAO extends PKPSectionDAO
                 (int)$section->getHideTitle(),
                 (int)$section->getHideAuthor(),
                 (int)$section->getIsInactive(),
+                (int)$section->getNotBrowsable(),
                 $this->nullOrInt($section->getAbstractWordCount()),
                 (int)$section->getId()
             ]

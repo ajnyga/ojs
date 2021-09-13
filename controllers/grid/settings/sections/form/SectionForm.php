@@ -73,6 +73,7 @@ class SectionForm extends PKPSectionForm
                 'abbrev' => $section->getAbbrev(null), // Localized
                 'reviewFormId' => $section->getReviewFormId(),
                 'isInactive' => $section->getIsInactive(),
+                'notBrowsable' => $section->getNotBrowsable(),
                 'metaIndexed' => !$section->getMetaIndexed(), // #2066: Inverted
                 'metaReviewed' => !$section->getMetaReviewed(), // #2066: Inverted
                 'abstractsNotRequired' => $section->getAbstractsNotRequired(),
@@ -156,7 +157,7 @@ class SectionForm extends PKPSectionForm
     public function readInputData()
     {
         parent::readInputData();
-        $this->readUserVars(['abbrev', 'urlPath', 'description', 'policy', 'reviewFormId', 'identifyType', 'isInactive', 'metaIndexed', 'metaReviewed', 'abstractsNotRequired', 'editorRestriction', 'hideTitle', 'hideAuthor', 'wordCount']);
+        $this->readUserVars(['abbrev', 'urlPath', 'description', 'policy', 'reviewFormId', 'identifyType', 'isInactive', 'notBrowsable', 'metaIndexed', 'metaReviewed', 'abstractsNotRequired', 'editorRestriction', 'hideTitle', 'hideAuthor', 'wordCount']);
         // For path duplicate checking; excuse the current path.
         if ($sectionId = $this->getSectionId()) {
             $sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SeriesDAO */
@@ -204,6 +205,7 @@ class SectionForm extends PKPSectionForm
         }
         $section->setReviewFormId($reviewFormId);
         $section->setIsInactive($this->getData('isInactive') ? 1 : 0);
+        $section->setNotBrowsable($this->getData('notBrowsable') ? 1 : 0);
         $section->setMetaIndexed($this->getData('metaIndexed') ? 0 : 1); // #2066: Inverted
         $section->setMetaReviewed($this->getData('metaReviewed') ? 0 : 1); // #2066: Inverted
         $section->setAbstractsNotRequired($this->getData('abstractsNotRequired') ? 1 : 0);
