@@ -14,6 +14,9 @@
  * @uses $hideGalleys bool Hide the article galleys for this article?
  * @uses $primaryGenreIds array List of file genre ids for primary file types
  * @uses $heading string HTML heading element, default: h2
+ * @uses $hidePageNumbers bool Hide pagenumbers for this article?
+ * @uses $issueUrl string issue url
+ * @uses $issueName string issue name
  *}
 {assign var=articlePath value=$article->getBestId()}
 {if !$heading}
@@ -49,16 +52,23 @@
 		</a>
 	</{$heading}>
 
-	{if $showAuthor || $article->getPages() || ($article->getDatePublished() && $showDatePublished)}
+	{if $issueName || $showAuthor || $article->getPages() || ($article->getDatePublished() && $showDatePublished)}
 	<div class="meta">
+
+		{if $issueName}
+			<div class="issue">
+				<a href="{$issueUrl|escape}">{$issueName|escape}</a>
+			</div>
+		{/if}
+
 		{if $showAuthor}
-		<div class="authors">
-			{$article->getAuthorString()|escape}
-		</div>
+			<div class="authors">
+				{$article->getAuthorString()|escape}
+			</div>
 		{/if}
 
 		{* Page numbers for this article *}
-		{if $article->getPages()}
+		{if !$hidePageNumbers && $article->getPages()}
 			<div class="pages">
 				{$article->getPages()|escape}
 			</div>

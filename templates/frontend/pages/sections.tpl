@@ -11,6 +11,8 @@
  * @uses $sectionUrlPath string The URL path for this section
  * @uses $sectionDescription string
  * @uses $submissions array List of Submission objects
+ * @uses $issueUrls array list of issue url's
+ * @uses $issueNames array list of issue name
  * @uses $currentlyShowingStart int 20 in `20-30 of 100 results`
  * @uses $currentlyShowingEnd int 30 in `20-30 of 100 results`
  * @uses $countMax int 100 in `20-30 of 100 results`
@@ -38,7 +40,7 @@
 			{foreach from=$submissions item=article}
 				<li>
 					{* TODO remove section=null workaround *}
-					{include file="frontend/objects/article_summary.tpl" section=null showDatePublished=true}
+					{include file="frontend/objects/article_summary.tpl" section=null hidePageNumbers=true issueUrl=$issueUrls[$article->getId()] issueName=$issueNames[$article->getId()]}.
 				</li>
 			{/foreach}
 

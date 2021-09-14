@@ -14,10 +14,10 @@
  *
  */
 
-use APP\handler\Handler;
+use APP\facades\Repo;
 
+use APP\handler\Handler;
 use APP\template\TemplateManager;
-use PKP\submission\PKPSubmission;
 
 class SectionsHandler extends Handler
 {
@@ -55,6 +55,7 @@ class SectionsHandler extends Handler
         $sectionUrlPath = $args[0] ?? null;
         $page = isset($args[1]) && ctype_digit((string) $args[1]) ? (int) $args[1] : 1;
         $context = $request->getContext();
+        $router = $request->getRouter();
         $contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
 
         // The page $arg can only contain an integer that's not 1. The first page
@@ -106,8 +107,14 @@ class SectionsHandler extends Handler
         }
 
         $submissions = [];
+        $issueUrls = [];
+        $issueNames = [];
         foreach ($result as $submission) {
             $submissions[] = $submission;
+            $issue = Repo::issue()->getBySubmissionId($submission->getId());
+            $issueUrls = [$submission->getId()] = $router->url($request, $context->getPath(), 'issue', 'view', $object->getBestIssueId(), null, null, true);
+            ;
+            $issueNames = [$submission->getId()] = $issue->getIssueIdentification();
         }
 
         $showingStart = $params['offset'] + 1;
@@ -120,6 +127,8 @@ class SectionsHandler extends Handler
             'section' => $section,
             'sectionUrlPath' => $sectionUrlPath,
             'submissions' => $submissions,
+            'issueUrls' => $issueUrls,
+            'issueNames' => $issueNames,
             'showingStart' => $showingStart,
             'showingEnd' => $showingEnd,
             'total' => $total,

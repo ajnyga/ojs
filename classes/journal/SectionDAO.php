@@ -261,7 +261,7 @@ class SectionDAO extends PKPSectionDAO
             'INSERT INTO sections
 				(journal_id, review_form_id, url_path, seq, meta_indexed, meta_reviewed, abstracts_not_required, editor_restricted, hide_title, hide_author, is_inactive, not_browsable, abstract_word_count)
 				VALUES
-				(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+				(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 (int)$section->getJournalId(),
                 (int)$section->getReviewFormId(),
