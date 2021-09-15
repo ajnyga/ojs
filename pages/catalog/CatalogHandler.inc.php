@@ -21,6 +21,8 @@ class CatalogHandler extends Handler
      * Redirect calls to category
      * https://github.com/pkp/pkp-lib/issues/5932
      *
+     * @deprecated 3.4
+     *
      */
     public function category($args, $request)
     {
@@ -31,6 +33,8 @@ class CatalogHandler extends Handler
     /**
      * Redirect calls to full sized image for a category.
      * https://github.com/pkp/pkp-lib/issues/5932
+     *
+     * @deprecated 3.4
      *
      */
 
@@ -43,6 +47,8 @@ class CatalogHandler extends Handler
     /**
      * Redirect calls to thumbnail for a category.
      * https://github.com/pkp/pkp-lib/issues/5932
+     *
+     * @deprecated 3.4
      *
      */
     public function thumbnail($args, $request)

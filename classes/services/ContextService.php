@@ -69,7 +69,7 @@ class ContextService extends \PKP\services\PKPContextService
         $section = $sectionDao->newDataObject();
         $section->setTitle(__('section.default.title'), $context->getPrimaryLocale());
         $section->setAbbrev(__('section.default.abbrev'), $context->getPrimaryLocale());
-        $section->setPath(__('section.default.path'), $context->getPrimaryLocale());
+        $section->setUrlPath(__('section.default.urlPath'), $context->getPrimaryLocale());
         $section->setMetaIndexed(true);
         $section->setMetaReviewed(true);
         $section->setPolicy(__('section.default.policy'), $context->getPrimaryLocale());
