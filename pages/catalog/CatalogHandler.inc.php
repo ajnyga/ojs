@@ -27,7 +27,7 @@ class CatalogHandler extends Handler
     public function category($args, $request)
     {
         header('HTTP/1.1 301 Moved Permanently');
-        $request->redirect(null, 'articles', 'category', [$args[0]]);
+        $request->redirect(null, 'articles', 'category', $args);
     }
 
     /**
