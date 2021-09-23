@@ -17,6 +17,8 @@
 use APP\facades\Repo;
 
 use APP\handler\Handler;
+use APP\submission\Collector;
+use APP\submission\Submission;
 use APP\template\TemplateManager;
 
 class SectionsHandler extends Handler
@@ -87,24 +89,18 @@ class SectionsHandler extends Handler
             exit;
         }
 
-        import('classes.submission.Submission'); // Import status constants
+        $count = $context->getData('itemsPerPage') ? $context->getData('itemsPerPage') : Config::getVar('interface', 'items_per_page');
+        $offset = $page > 1 ? ($page - 1) * $count : 0;
 
-        $params = [
-            'contextId' => $contextId,
-            'count' => $context->getData('itemsPerPage'),
-            'offset' => $page ? ($page - 1) * $context->getData('itemsPerPage') : 0,
-            'orderBy' => 'datePublished',
-            'sectionIds' => [(int) $section->getId()],
-            'status' => PKPSubmission::STATUS_PUBLISHED,
-        ];
+        $collector = Repo::submission()
+            ->getCollector()
+            ->filterByContextIds([$context->getId()])
+            ->filterBySectionIds([(int) $section->getId()])
+            ->filterByStatus([Submission::STATUS_PUBLISHED])
+            ->orderBy(Collector::ORDERBY_DATE_PUBLISHED, Collector::ORDER_DIR_ASC);
 
-        $result = Services::get('submission')->getMany($params);
-        $total = Services::get('submission')->getMax($params);
-
-        if ($page > 1 && !$result->valid()) {
-            $request->getDispatcher()->handle404();
-            exit;
-        }
+        $total = Repo::submission()->getCount($collector);
+        $result = Repo::submission()->getMany($collector->limit($count)->offset($offset));
 
         $submissions = [];
         $issueUrls = [];
@@ -112,9 +108,8 @@ class SectionsHandler extends Handler
         foreach ($result as $submission) {
             $submissions[] = $submission;
             $issue = Repo::issue()->getBySubmissionId($submission->getId());
-            $issueUrls = [$submission->getId()] = $router->url($request, $context->getPath(), 'issue', 'view', $object->getBestIssueId(), null, null, true);
-            ;
-            $issueNames = [$submission->getId()] = $issue->getIssueIdentification();
+            $issueUrls[$submission->getId()] = $router->url($request, $context->getPath(), 'issue', 'view', $issue->getBestIssueId(), null, null, true);
+            $issueNames[$submission->getId()] = $issue->getIssueIdentification();
         }
 
         $showingStart = $params['offset'] + 1;
