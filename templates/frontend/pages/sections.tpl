@@ -40,7 +40,7 @@
 			{foreach from=$submissions item=article}
 				<li>
 					{* TODO remove section=null workaround *}
-					{include file="frontend/objects/article_summary.tpl" section=null hidePageNumbers=true issueUrl=$issueUrls[$article->getId()] issueName=$issueNames[$article->getId()]}.
+					{include file="frontend/objects/article_summary.tpl" section=null hideGalleys=true hidePageNumbers=true heading="h3" issueUrl=$issueUrls[$article->getId()] issueName=$issueNames[$article->getId()]}.
 				</li>
 			{/foreach}
 

@@ -112,10 +112,11 @@ class SectionsHandler extends Handler
             $issueNames[$submission->getId()] = $issue->getIssueIdentification();
         }
 
-        $showingStart = $params['offset'] + 1;
-        $showingEnd = min($params['offset'] + $params['count'], $params['offset'] + count($submissions));
+        $showingStart = $offset + 1;
+        $showingEnd = min($offset + $count, $offset + count($submissions));
         $nextPage = $total > $showingEnd ? $page + 1 : null;
         $prevPage = $showingStart > 1 ? $page - 1 : null;
+
 
         $templateMgr = TemplateManager::getManager($request);
         $templateMgr->assign([

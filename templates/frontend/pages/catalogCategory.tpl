@@ -54,7 +54,7 @@
 		<ul>
 			{foreach from=$subcategories item=subcategory}
 				<li>
-					<a href="{url op="category" path=$subcategory->getPath()}">
+					<a href="{url op="category" path=$subcategory->getParentPath()|to_array:$subcategory->getPath()}">
 						{$subcategory->getLocalizedTitle()|escape}
 					</a>
 				</li>
@@ -74,19 +74,20 @@
 		<ul class="cmp_article_list articles">
 			{foreach from=$publishedSubmissions item=article}
 				<li>
-					{include file="frontend/objects/article_summary.tpl" article=$article hideGalleys=true heading="h3"}
+					{include file="frontend/objects/article_summary.tpl" article=$article hidePageNumbers=true hideGalleys=true heading="h3"}
 				</li>
 			{/foreach}
 		</ul>
 
 		{* Pagination *}
+		{capture assign=categoryFullPath}{$category->getParentPath()|to_array:$category->getPath()}{/capture}
 		{if $prevPage > 1}
-			{capture assign=prevUrl}{url router=\PKP\core\PKPApplication::ROUTE_PAGE page="catalog" op="category" path=$category->getPath()|to_array:"page":$prevPage}{/capture}
+			{capture assign=prevUrl}{url router=\PKP\core\PKPApplication::ROUTE_PAGE page="catalog" op="category" path=$categoryFullPath|to_array:"page":$prevPage}{/capture}
 		{elseif $prevPage === 1}
-			{capture assign=prevUrl}{url router=\PKP\core\PKPApplication::ROUTE_PAGE page="catalog" op="category" path=$category->getPath()}{/capture}
+			{capture assign=prevUrl}{url router=\PKP\core\PKPApplication::ROUTE_PAGE page="catalog" op="category" path=$categoryFullPath}{/capture}
 		{/if}
 		{if $nextPage}
-			{capture assign=nextUrl}{url router=\PKP\core\PKPApplication::ROUTE_PAGE page="catalog" op="category" path=$category->getPath()|to_array:"page":$nextPage}{/capture}
+			{capture assign=nextUrl}{url router=\PKP\core\PKPApplication::ROUTE_PAGE page="catalog" op="category" path=$categoryFullPath|to_array:"page":$nextPage}{/capture}
 		{/if}
 		{include
 			file="frontend/components/pagination.tpl"
