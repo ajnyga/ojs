@@ -265,7 +265,7 @@ class SectionDAO extends PKPSectionDAO
             [
                 (int)$section->getJournalId(),
                 (int)$section->getReviewFormId(),
-                $section->getUrlPath(),
+                (string) $section->getUrlPath(),
                 (float) $section->getSequence(),
                 $section->getMetaIndexed() ? 1 : 0,
                 $section->getMetaReviewed() ? 1 : 0,
@@ -309,7 +309,7 @@ class SectionDAO extends PKPSectionDAO
 				WHERE section_id = ?',
             [
                 (int)$section->getReviewFormId(),
-                $section->getUrlPath(),
+                (string) $section->getUrlPath(),
                 (float) $section->getSequence(),
                 (int)$section->getMetaIndexed(),
                 (int)$section->getMetaReviewed(),
@@ -676,6 +676,24 @@ class SectionDAO extends PKPSectionDAO
             'UPDATE custom_section_orders SET seq = ? WHERE issue_id = ? AND section_id = ?',
             [(float) $seq, (int) $issueId, (int) $sectionId]
         );
+    }
+
+    /**
+     * Retrieve a section by urlPath.
+     *
+     * @param $urlPath string
+     * @param $journalId int
+     *
+     * @return Section|null
+     */
+    public function getByPath($urlPath, $journalId)
+    {
+        $result = $this->retrieve(
+            'SELECT * FROM sections WHERE url_path = ? AND journal_id = ?',
+            [(string) $urlPath, (int) $journalId]
+        );
+        $row = $result->current();
+        return $row ? $this->_fromRow((array) $row) : null;
     }
 }
 

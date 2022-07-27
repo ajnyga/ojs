@@ -80,26 +80,6 @@ class Section extends PKPSection
     }
 
     /**
-     * Get section url path.
-     *
-     * @return string
-     */
-    public function getUrlPath()
-    {
-        return $this->getData('urlPath');
-    }
-
-    /**
-     * Set section url path.
-     *
-     * @param $path string
-     */
-    public function setUrlPath($urlPath)
-    {
-        return $this->setData('urlPath', $urlPath);
-    }
-
-    /**
      * Get localized section description.
      *
      * @return string
@@ -318,7 +298,6 @@ class Section extends PKPSection
     /**
      * Set if section is browsable.
      *
-     * @param $isInactive int
      */
     public function setNotBrowsable($notBrowsable)
     {

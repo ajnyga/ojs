@@ -14,12 +14,14 @@
  *
  */
 
+use APP\core\Application;
 use APP\facades\Repo;
 
 use APP\handler\Handler;
-use APP\submission\Collector;
+use APP\security\authorization\OjsJournalMustPublishPolicy;
 use APP\submission\Submission;
 use APP\template\TemplateManager;
+use PKP\security\authorization\ContextRequiredPolicy;
 
 class SectionsHandler extends Handler
 {
@@ -31,12 +33,8 @@ class SectionsHandler extends Handler
      */
     public function authorize($request, &$args, $roleAssignments)
     {
-        import('lib.pkp.classes.security.authorization.ContextRequiredPolicy');
         $this->addPolicy(new ContextRequiredPolicy($request));
-
-        import('classes.security.authorization.OjsJournalMustPublishPolicy');
         $this->addPolicy(new OjsJournalMustPublishPolicy($request));
-
         return parent::authorize($request, $args, $roleAssignments);
     }
 
@@ -58,7 +56,7 @@ class SectionsHandler extends Handler
         $page = isset($args[1]) && ctype_digit((string) $args[1]) ? (int) $args[1] : 1;
         $context = $request->getContext();
         $router = $request->getRouter();
-        $contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
+        $contextId = $context ? $context->getId() : Application::CONTEXT_ID_NONE;
 
         // The page $arg can only contain an integer that's not 1. The first page
         // URL does not include page $arg
@@ -92,12 +90,12 @@ class SectionsHandler extends Handler
         $count = $context->getData('itemsPerPage') ? $context->getData('itemsPerPage') : Config::getVar('interface', 'items_per_page');
         $offset = $page > 1 ? ($page - 1) * $count : 0;
 
-        $collector = Repo::submission()
-            ->getCollector()
+        $collector = Repo::submission()->getCollector();
+        $collector
             ->filterByContextIds([$context->getId()])
             ->filterBySectionIds([(int) $section->getId()])
             ->filterByStatus([Submission::STATUS_PUBLISHED])
-            ->orderBy(Collector::ORDERBY_DATE_PUBLISHED, Collector::ORDER_DIR_ASC);
+            ->orderBy($collector::ORDERBY_DATE_PUBLISHED, $collector::ORDER_DIR_ASC);
 
         $total = Repo::submission()->getCount($collector);
         $result = Repo::submission()->getMany($collector->limit($count)->offset($offset));

@@ -25,7 +25,7 @@ use PKP\security\Validation;
 
 class SectionForm extends PKPSectionForm
 {
-    /** @var int $_pressId */
+    /** @var int $_journalId */
     public $_journalId;
 
     /**
@@ -45,10 +45,20 @@ class SectionForm extends PKPSectionForm
         $this->_journalId = $journalId = $request->getContext()->getId();
 
         // Validation checks for this form
+        $form = $this;
         $this->addCheck(new \PKP\form\validation\FormValidatorLocale($this, 'title', 'required', 'manager.setup.form.section.nameRequired'));
         $this->addCheck(new \PKP\form\validation\FormValidatorLocale($this, 'abbrev', 'required', 'manager.sections.form.abbrevRequired'));
-        $this->addCheck(new \PKP\form\validation\FormValidator($this, 'urlPath', 'required', 'manager.setup.form.section.urlPathRequired'));
-        $this->addCheck(new \PKP\form\validation\FormValidatorRegExp($this, 'urlPath', 'required', 'manager.setup.form.section.urlPathAlphaNumeric', '/^[a-zA-Z0-9\/._-]+$/'));
+        $this->addCheck(new \PKP\form\validation\FormValidatorRegExp($this, 'urlPath', 'required', 'grid.section.urlPathAlphaNumeric', '/^[a-zA-Z0-9\/._-]+$/'));
+        $this->addCheck(new \PKP\form\validation\FormValidatorCustom(
+            $this,
+            'urlPath',
+            'required',
+            'grid.section.urlPathExists',
+            function ($path) use ($form, $journalId) {
+                $sectionDao = DAORegistry::getDAO('SectionDAO'); /* @var $sectionDao SectionDAO */
+                return !$sectionDao->getByPath($path, $journalId) || ($form->getData('oldPath') != null && $form->getData('oldPath') == $path);
+            }
+        ));
         $journal = $request->getJournal();
         $this->addCheck(new \PKP\form\validation\FormValidatorCustom($this, 'reviewFormId', 'optional', 'manager.sections.form.reviewFormId', [DAORegistry::getDAO('ReviewFormDAO'), 'reviewFormExists'], [ASSOC_TYPE_JOURNAL, $journal->getId()]));
     }
