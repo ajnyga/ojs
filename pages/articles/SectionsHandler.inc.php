@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file pages/sections/SectionsHandler.inc.php
+ * @file pages/articles/SectionsHandler.inc.php
  *
  * Copyright (c) 2014-2021 Simon Fraser University
  * Copyright (c) 2003-2021 John Willinsky
@@ -16,11 +16,11 @@
 
 use APP\core\Application;
 use APP\facades\Repo;
-
 use APP\handler\Handler;
 use APP\security\authorization\OjsJournalMustPublishPolicy;
 use APP\submission\Submission;
 use APP\template\TemplateManager;
+use PKP\db\DAORegistry;
 use PKP\security\authorization\ContextRequiredPolicy;
 
 class SectionsHandler extends Handler
@@ -55,8 +55,8 @@ class SectionsHandler extends Handler
         $sectionUrlPath = $args[0] ?? null;
         $page = isset($args[1]) && ctype_digit((string) $args[1]) ? (int) $args[1] : 1;
         $context = $request->getContext();
-        $router = $request->getRouter();
         $contextId = $context ? $context->getId() : Application::CONTEXT_ID_NONE;
+        $router = $request->getRouter();
 
         // The page $arg can only contain an integer that's not 1. The first page
         // URL does not include page $arg
@@ -81,37 +81,39 @@ class SectionsHandler extends Handler
             }
         }
 
-        // If section does not exist or is not browsable
         if (!$sectionExists || $section->getNotBrowsable()) {
             $request->getDispatcher()->handle404();
             exit;
         }
 
-        $count = $context->getData('itemsPerPage') ? $context->getData('itemsPerPage') : Config::getVar('interface', 'items_per_page');
-        $offset = $page > 1 ? ($page - 1) * $count : 0;
+        $limit = $context->getData('itemsPerPage') ? $context->getData('itemsPerPage') : Config::getVar('interface', 'items_per_page');
+        $offset = $page > 1 ? ($page - 1) * $limit : 0;
 
         $collector = Repo::submission()->getCollector();
         $collector
-            ->filterByContextIds([$context->getId()])
+            ->filterByContextIds([$contextId])
             ->filterBySectionIds([(int) $section->getId()])
             ->filterByStatus([Submission::STATUS_PUBLISHED])
             ->orderBy($collector::ORDERBY_DATE_PUBLISHED, $collector::ORDER_DIR_ASC);
 
         $total = Repo::submission()->getCount($collector);
-        $result = Repo::submission()->getMany($collector->limit($count)->offset($offset));
+        $submissions = Repo::submission()->getMany($collector->limit($limit)->offset($offset));
 
-        $submissions = [];
+        if ($page > 1 && !$submissions->count()) {
+            $request->getDispatcher()->handle404();
+            exit;
+        }
+
         $issueUrls = [];
         $issueNames = [];
-        foreach ($result as $submission) {
-            $submissions[] = $submission;
+        foreach ($submissions as $submission) {
             $issue = Repo::issue()->getBySubmissionId($submission->getId());
             $issueUrls[$submission->getId()] = $router->url($request, $context->getPath(), 'issue', 'view', $issue->getBestIssueId(), null, null, true);
             $issueNames[$submission->getId()] = $issue->getIssueIdentification();
         }
 
-        $showingStart = $offset + 1;
-        $showingEnd = min($offset + $count, $offset + count($submissions));
+        $showingStart = $collector->offset + 1;
+        $showingEnd = min($collector->offset + $collector->count, $collector->offset + $submissions->count());
         $nextPage = $total > $showingEnd ? $page + 1 : null;
         $prevPage = $showingStart > 1 ? $page - 1 : null;
 

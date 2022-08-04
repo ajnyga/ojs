@@ -46,12 +46,12 @@
 
 			{* Pagination *}
 			{if $prevPage > 1}
-				{capture assign="prevUrl"}{url|escape router=$smarty.const.ROUTE_PAGE page="section" op="view" path=$sectionUrlPath|to_array:$prevPage}{/capture}
+				{capture assign="prevUrl"}{url|escape router=$smarty.const.ROUTE_PAGE page="articles" op="section" path=$sectionUrlPath|to_array:$prevPage}{/capture}
 			{elseif $prevPage === 1}
-				{capture assign="prevUrl"}{url|escape router=$smarty.const.ROUTE_PAGE page="section" op="view" path=$sectionUrlPath}{/capture}
+				{capture assign="prevUrl"}{url|escape router=$smarty.const.ROUTE_PAGE page="articles" op="section" path=$sectionUrlPath}{/capture}
 			{/if}
 			{if $nextPage}
-				{capture assign="nextUrl"}{url|escape router=$smarty.const.ROUTE_PAGE page="section" op="view" path=$sectionUrlPath|to_array:$nextPage}{/capture}
+				{capture assign="nextUrl"}{url|escape router=$smarty.const.ROUTE_PAGE page="articles" op="section" path=$sectionUrlPath|to_array:$nextPage}{/capture}
 			{/if}
 			{include
 				file="frontend/components/pagination.tpl"
