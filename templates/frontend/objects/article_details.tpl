@@ -244,6 +244,9 @@
 				</section>
 			{/if}
 
+{** DATACITATIONS TODO *}
+
+
 			{* References *}
 			{if $parsedCitations || $publication->getData('citationsRaw')}
 				<section class="item references">
@@ -354,6 +357,8 @@
 				{/if}
 			</div>
 			{/if}
+
+{** DATACITATIONS TODO *}
 
 			{* Data Availability Statement *}
 			{if $publication->getLocalizedData('dataAvailability')}

@@ -293,6 +293,8 @@ class ArticleHandler extends Handler
                 ->all()
         ]);
 
+        // DATACITATIONS TODO
+
         // Citations
         if ($publication->getData('citationsRaw')) {
             $citationDao = DAORegistry::getDAO('CitationDAO'); /** @var CitationDAO $citationDao */
